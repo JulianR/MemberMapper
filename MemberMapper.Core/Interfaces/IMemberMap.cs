@@ -1,0 +1,16 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace MemberMapper.Core.Interfaces
+{
+  public interface IMemberMap : IProposedMap
+  {
+    Type SourceType { get; set; }
+    Type DestinationType { get; set; }
+
+    Delegate MappingFunction { get; set; }
+
+  }
+}
