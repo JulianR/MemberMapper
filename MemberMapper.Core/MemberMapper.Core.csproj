@@ -26,7 +26,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -51,7 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Implementations\MappingOption.cs" />
-    <Compile Include="Implementations\MappingStrategies\DefaultMappingStrategy.cs" />
+    <Compile Include="Implementations\DefaultMappingStrategy.cs" />
     <Compile Include="Implementations\ProposedMemberMapping.cs" />
     <Compile Include="Implementations\MemberMap.cs" />
     <Compile Include="Implementations\DefaultMemberMapper.cs" />

@@ -126,7 +126,7 @@ namespace MemberMapper.Test
     }
 
     [TestMethod]
-    public void ComplexTypeIsCorrectlyMapper()
+    public void ComplexTypeIsCorrectlyMapped()
     {
       var mapper = new DefaultMemberMapper();
 
@@ -146,6 +146,92 @@ namespace MemberMapper.Test
       Assert.IsNotNull(destination.Complex);
       Assert.AreEqual(destination.Complex.Name, "test");
       Assert.AreEqual(destination.Complex.ID, 10);
+
+    }
+
+    [TestMethod]
+    public void ComplexTypeMappingHandlesNullValues()
+    {
+      var mapper = new DefaultMemberMapper();
+
+      var source = new ComplexSourceType
+      {
+        ID = 5,
+        Complex = null
+      };
+
+      var destination = mapper.Map<ComplexSourceType, ComplexDestinationType>(source);
+
+      Assert.AreEqual(destination.ID, 5);
+      Assert.IsNull(destination.Complex);
+
+    }
+
+    [TestMethod]
+    public void ComplexTypeMappingRespectsExistingMapping()
+    {
+      var mapper = new DefaultMemberMapper();
+
+      var proposed = mapper.CreateMap(typeof(ComplexSourceType), typeof(ComplexDestinationType),
+      (p, option) =>
+      {
+        if (p.Name == "Name")
+        {
+          option.IgnoreMember();
+        }
+      });
+
+      proposed.FinalizeMap();
+
+      var source = new ComplexSourceType
+      {
+        ID = 5,
+        Complex = new NestedSourceType
+        {
+          ID = 10,
+          Name = "test"
+        }
+      };
+
+      var destination = mapper.Map<ComplexSourceType, ComplexDestinationType>(source);
+
+      Assert.AreEqual(destination.ID, 5);
+      Assert.IsNotNull(destination.Complex);
+      Assert.AreNotEqual(destination.Complex.Name, source.Complex.Name);
+
+    }
+
+    [TestMethod]
+    public void ComplexTypeMappingRespectsExistingMappingForOtherTypes()
+    {
+      var mapper = new DefaultMemberMapper();
+
+      var proposed = mapper.CreateMap(typeof(NestedSourceType), typeof(NestedDestinationType),
+      (p, option) =>
+      {
+        if (p.Name == "Name")
+        {
+          option.IgnoreMember();
+        }
+      });
+
+      proposed.FinalizeMap();
+
+      var source = new ComplexSourceType
+      {
+        ID = 5,
+        Complex = new NestedSourceType
+        {
+          ID = 10,
+          Name = "test"
+        }
+      };
+
+      var destination = mapper.Map<ComplexSourceType, ComplexDestinationType>(source);
+
+      Assert.AreEqual(destination.ID, 5);
+      Assert.IsNotNull(destination.Complex);
+      Assert.AreNotEqual(destination.Complex.Name, source.Complex.Name);
 
     }
 

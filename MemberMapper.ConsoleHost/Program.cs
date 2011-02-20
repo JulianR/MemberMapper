@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using MemberMapper.Core.Implementations.MappingStrategies;
 using MemberMapper.Core.Implementations;
 
 namespace MemberMapper.ConsoleHost

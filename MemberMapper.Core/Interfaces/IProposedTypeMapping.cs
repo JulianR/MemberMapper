@@ -8,8 +8,8 @@ namespace MemberMapper.Core.Interfaces
 {
   public interface IProposedTypeMapping
   {
-    MemberInfo SourceProperty { get; set; }
-    MemberInfo DestinationProperty { get; set; }
+    MemberInfo SourceMember { get; set; }
+    MemberInfo DestinationMember { get; set; }
 
     IList<IProposedMemberMapping> ProposedMappings { get; }
     IList<IProposedTypeMapping> ProposedTypeMappings { get; }

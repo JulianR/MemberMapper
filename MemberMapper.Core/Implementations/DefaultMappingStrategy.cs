@@ -5,7 +5,7 @@ using System.Text;
 using MemberMapper.Core.Interfaces;
 using System.Reflection;
 
-namespace MemberMapper.Core.Implementations.MappingStrategies
+namespace MemberMapper.Core.Implementations
 {
   public class DefaultMappingStrategy : IMappingStrategy
   {
@@ -21,11 +21,16 @@ namespace MemberMapper.Core.Implementations.MappingStrategies
     {
     }
 
-    private static ProposedTypeMapping GetTypeMapping(TypePair pair, Action<PropertyInfo, IMappingOption> options = null)
+    private Dictionary<TypePair, ProposedTypeMapping> mappingCache = new Dictionary<TypePair, ProposedTypeMapping>();
+
+    private ProposedTypeMapping GetTypeMapping(TypePair pair, Action<PropertyInfo, IMappingOption> options = null)
     {
 
 
       var typeMapping = new ProposedTypeMapping();
+
+      typeMapping.SourceMember = null;
+      typeMapping.DestinationMember = null;
 
       var destinationProperties = (from p in pair.DestinationType.GetProperties()
                                    where p.CanWrite
@@ -68,9 +73,23 @@ namespace MemberMapper.Core.Implementations.MappingStrategies
         }
         else if (match != null)
         {
-          typeMapping.ProposedTypeMappings.Add(GetTypeMapping(new TypePair(property.PropertyType, match.PropertyType), options));
+          var complexPair = new TypePair(property.PropertyType, match.PropertyType);
+
+          ProposedTypeMapping complexTypeMapping;
+
+          if (!mappingCache.TryGetValue(complexPair, out complexTypeMapping))
+          {
+            complexTypeMapping = GetTypeMapping(complexPair, options);
+          }
+
+          complexTypeMapping.DestinationMember = match;
+          complexTypeMapping.SourceMember = property;
+
+          typeMapping.ProposedTypeMappings.Add(complexTypeMapping);
         }
       }
+
+      mappingCache.Add(pair, typeMapping);
 
       return typeMapping;
     }

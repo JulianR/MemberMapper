@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using MemberMapper.Core.Interfaces;
 using Ninject;
-using MemberMapper.Core.Implementations.MappingStrategies;
 
 namespace MemberMapper.Core.Implementations
 {
@@ -41,7 +40,6 @@ namespace MemberMapper.Core.Implementations
         var proposedMap = this.MappingStrategy.CreateMap(pair, options);
 
         return proposedMap;
-
       }
 
       return map;

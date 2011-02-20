@@ -28,7 +28,7 @@ namespace MemberMapper.Core.Implementations
 
     public override int GetHashCode()
     {
-      return this.To.MetadataToken ^ this.From.MetadataToken;
+      return this.To.GetHashCode() ^ this.From.GetHashCode();
     }
   }
 }

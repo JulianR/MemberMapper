@@ -3,7 +3,6 @@ using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MemberMapper.Core.Implementations.MappingStrategies;
 using MemberMapper.Core.Implementations;
 using System.Linq.Expressions;
 using MemberMapper.Core.Interfaces;
@@ -73,25 +72,24 @@ namespace MemberMapper.Test
       int foundMappings = 0;
       foreach (var mapping in mappings.Mappings)
       {
-        foreach (var typeMapping in map.ProposedTypeMappings)
+
+        if (!map.ProposedTypeMapping.ProposedMappings.Contains(
+        new ProposedMemberMapping()
         {
-          if (!typeMapping.ProposedMappings.Contains(
-          new ProposedMemberMapping()
-          {
-            From = GetMemberInfoFromExpression(mapping.Left.Body),
-            To = GetMemberInfoFromExpression(mapping.Right.Body)
-          }))
-          {
-            return false;
-          }
-          else
-          {
-            foundMappings++;
-          }
+          From = GetMemberInfoFromExpression(mapping.Left.Body),
+          To = GetMemberInfoFromExpression(mapping.Right.Body)
+        }))
+        {
+          return false;
         }
+        else
+        {
+          foundMappings++;
+        }
+
       }
 
-      if (map.ProposedTypeMappings.Sum(p => p.ProposedMappings.Count) != foundMappings)
+      if (map.ProposedTypeMapping.ProposedMappings.Count != foundMappings)
       {
         return false;
       }

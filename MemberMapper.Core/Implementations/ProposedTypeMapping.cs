@@ -9,12 +9,13 @@ namespace MemberMapper.Core.Implementations
 {
   public class ProposedTypeMapping : IProposedTypeMapping
   {
-    public MemberInfo SourceProperty { get; set; }
-    public MemberInfo DestinationProperty { get; set; }
+    public MemberInfo SourceMember { get; set; }
+    public MemberInfo DestinationMember { get; set; }
 
     public ProposedTypeMapping()
     {
       ProposedMappings = new List<IProposedMemberMapping>();
+      ProposedTypeMappings = new List<IProposedTypeMapping>();
     }
 
     public IList<IProposedTypeMapping> ProposedTypeMappings { get; set; }
