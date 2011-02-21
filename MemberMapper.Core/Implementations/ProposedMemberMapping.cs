@@ -30,5 +30,11 @@ namespace MemberMapper.Core.Implementations
     {
       return this.To.GetHashCode() ^ this.From.GetHashCode();
     }
+
+    public bool IsEnumerable
+    {
+      get;
+      set;
+    }
   }
 }

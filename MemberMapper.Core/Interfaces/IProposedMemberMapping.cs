@@ -10,5 +10,6 @@ namespace MemberMapper.Core.Interfaces
   {
     MemberInfo From { get; set; }
     MemberInfo To { get; set; }
+    bool IsEnumerable { get; set; }
   }
 }

@@ -42,8 +42,7 @@ namespace MemberMapper.Core.Implementations
       foreach (var complexTypeMapping in typeMapping.ProposedTypeMappings)
       {
 
-        var ifNotNullBlock = new List<Expression>();
-
+        
         ParameterExpression complexSource = null, complexDest = null;
 
         if (complexTypeMapping.SourceMember.MemberType == MemberTypes.Property)
@@ -66,6 +65,8 @@ namespace MemberMapper.Core.Implementations
 
         newParams.Add(complexSource);
         newParams.Add(complexDest);
+
+        var ifNotNullBlock = new List<Expression>();
 
         ifNotNullBlock.Add(Expression.Assign(complexSource, Expression.Property(source, complexTypeMapping.SourceMember.Name)));
 
