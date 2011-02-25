@@ -12,7 +12,12 @@ namespace MemberMapper.Core.Implementations
     public DefaultMemberMapper(IMappingStrategy strategy = null)
     {
       this.MappingStrategy = strategy ?? new DefaultMappingStrategy();
-      this.MappingStrategy.Mapper = this;
+
+      this.MappingStrategy.MemberMapCreated += map =>
+      {
+        this.RegisterMap(map);
+      };
+
     }
 
     private Dictionary<TypePair, IMemberMap> maps = new Dictionary<TypePair, IMemberMap>();

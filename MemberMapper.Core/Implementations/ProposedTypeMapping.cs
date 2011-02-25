@@ -9,8 +9,10 @@ namespace MemberMapper.Core.Implementations
 {
   public class ProposedTypeMapping : IProposedTypeMapping
   {
-    public MemberInfo SourceMember { get; set; }
-    public MemberInfo DestinationMember { get; set; }
+    public PropertyOrFieldInfo SourceMember { get; set; }
+    public PropertyOrFieldInfo DestinationMember { get; set; }
+
+    public bool IsEnumerable { get; set; }
 
     public ProposedTypeMapping()
     {
@@ -21,5 +23,22 @@ namespace MemberMapper.Core.Implementations
     public IList<IProposedTypeMapping> ProposedTypeMappings { get; set; }
 
     public IList<IProposedMemberMapping> ProposedMappings { get; set; }
+
+    #region IProposedTypeMapping Members
+
+
+    public ProposedTypeMapping Clone()
+    {
+      return new ProposedTypeMapping
+      {
+        DestinationMember = this.DestinationMember,
+        SourceMember = this.SourceMember,
+        ProposedMappings = this.ProposedMappings,
+        ProposedTypeMappings = this.ProposedTypeMappings,
+        IsEnumerable = this.IsEnumerable
+      };
+    }
+
+    #endregion
   }
 }

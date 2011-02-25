@@ -57,7 +57,7 @@ namespace MemberMapper.Test
 
     }
 
-    private static MemberInfo GetMemberInfoFromExpression(Expression body)
+    private static PropertyOrFieldInfo GetMemberInfoFromExpression(Expression body)
     {
       if ((body != null) && ((body.NodeType == ExpressionType.Convert) || (body.NodeType == ExpressionType.ConvertChecked)))
       {
@@ -191,5 +191,102 @@ namespace MemberMapper.Test
       Assert.IsTrue(map.MappingFunction.GetType() == typeof(Func<IPocoOneProperty_From, PocoOneProperty_To, PocoOneProperty_To>));
 
     }
+
+    private class ListDestinationType
+    {
+      public List<int> Source { get; set; }
+    }
+
+    private class ListSourceType
+    {
+      public List<int> Source { get; set; }
+    }
+
+    private class IEnumerableSourceType
+    {
+      public IEnumerable<int> Source { get; set; }
+    }
+
+    private class ArrayDestinationType
+    {
+      public int[] Source { get; set; }
+    }
+
+    [TestMethod]
+    public void ListIntPropertyGetsNormalMapping()
+    {
+      var mapper = new DefaultMemberMapper(new DefaultMappingStrategy());
+
+      var proposition = mapper.CreateMap(typeof(ListSourceType), typeof(ListDestinationType));
+
+      Assert.IsTrue(proposition.ProposedTypeMapping.ProposedMappings.Any(p => !p.IsEnumerable));
+    }
+
+    [TestMethod]
+    public void ListIntPropertyGetsMappedToIEnumerable()
+    {
+      var mapper = new DefaultMemberMapper(new DefaultMappingStrategy());
+
+      var proposition = mapper.CreateMap(typeof(IEnumerableSourceType), typeof(ListDestinationType));
+
+      Assert.IsTrue(proposition.ProposedTypeMapping.ProposedMappings.Any(p => p.IsEnumerable));
+
+    }
+
+    [TestMethod]
+    public void ListIntPropertyGetsMappedToArray()
+    {
+      var mapper = new DefaultMemberMapper(new DefaultMappingStrategy());
+
+      var proposition = mapper.CreateMap(typeof(IEnumerableSourceType), typeof(ArrayDestinationType));
+
+      Assert.IsTrue(proposition.ProposedTypeMapping.ProposedMappings.Any(p => p.IsEnumerable));
+    }
+
+    private class SourceElementType
+    {
+      public int ID { get; set; }
+    }
+
+    private class ListComplexSourceType
+    {
+      public List<SourceElementType> Source { get; set; }
+    }
+
+    private class DestinationElementType
+    {
+      public int ID { get; set; }
+    }
+
+    private class ListComplexDestinationType
+    {
+      public List<DestinationElementType> Source { get; set; }
+    }
+
+    [TestMethod]
+    public void ComplexListGetsMapped()
+    {
+      var mapper = new DefaultMemberMapper(new DefaultMappingStrategy());
+
+      var proposition = mapper.CreateMap(typeof(ListComplexSourceType), typeof(ListComplexDestinationType));
+
+      Assert.IsTrue(proposition.ProposedTypeMapping.ProposedTypeMappings.Any(p => p.IsEnumerable));
+    }
+
+    private class IEnumerableComplexSourceType
+    {
+      public List<SourceElementType> Source { get; set; }
+    }
+
+    [TestMethod]
+    public void ComplexListGetsMappedFromIEnumerable()
+    {
+      var mapper = new DefaultMemberMapper(new DefaultMappingStrategy());
+
+      var proposition = mapper.CreateMap(typeof(IEnumerableComplexSourceType), typeof(ListComplexDestinationType));
+
+      Assert.IsTrue(proposition.ProposedTypeMapping.ProposedTypeMappings.Any(p => p.IsEnumerable));
+    }
+
   }
 }

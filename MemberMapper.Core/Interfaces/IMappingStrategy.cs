@@ -12,7 +12,6 @@ namespace MemberMapper.Core.Interfaces
 
     IMemberMap CreateAndFinalizeMap(TypePair pair, Action<System.Reflection.PropertyInfo, IMappingOption> options = null);
 
-
-    IMemberMapper Mapper { get; set; }
+    event Action<IMemberMap> MemberMapCreated;
   }
 }

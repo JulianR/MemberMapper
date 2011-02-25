@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Reflection;
+using MemberMapper.Core.Implementations;
 
 namespace MemberMapper.Core.Interfaces
 {
   public interface IProposedMemberMapping
   {
-    MemberInfo From { get; set; }
-    MemberInfo To { get; set; }
+    PropertyOrFieldInfo From { get; set; }
+    PropertyOrFieldInfo To { get; set; }
     bool IsEnumerable { get; set; }
   }
 }

@@ -10,34 +10,7 @@ namespace MemberMapper.Core.Implementations
 {
   public class DefaultMappingStrategy : IMappingStrategy
   {
-
-    public IMemberMapper Mapper { get; set; }
-
-    public DefaultMappingStrategy(IMemberMapper mapper)
-    {
-      this.Mapper = mapper;
-    }
-
-    public DefaultMappingStrategy()
-    {
-    }
-
     private Dictionary<TypePair, ProposedTypeMapping> mappingCache = new Dictionary<TypePair, ProposedTypeMapping>();
-
-    private Type GetTypeInsideEnumerable(PropertyInfo prop)
-    {
-      var getEnumeratorMethod = prop.PropertyType.GetMethod("GetEnumerator", Type.EmptyTypes);
-
-      if (getEnumeratorMethod == null) return null;
-
-      if (getEnumeratorMethod.ReturnType.IsGenericType)
-      {
-        return getEnumeratorMethod.ReturnType.GetGenericArguments().First();
-      }
-
-      return typeof(object);
-
-    }
 
     private ProposedTypeMapping GetTypeMapping(TypePair pair, Action<PropertyInfo, IMappingOption> options = null)
     {
@@ -94,8 +67,8 @@ namespace MemberMapper.Core.Implementations
             && typeof(IEnumerable).IsAssignableFrom(match.PropertyType))
           {
 
-            var typeOfSourceEnumerable = GetTypeInsideEnumerable(property);
-            var typeOfDestinationEnumerable = GetTypeInsideEnumerable(match);
+            var typeOfSourceEnumerable = CollectionTypeHelper.GetTypeInsideEnumerable(property);
+            var typeOfDestinationEnumerable = CollectionTypeHelper.GetTypeInsideEnumerable(match);
 
             if (typeOfDestinationEnumerable == typeOfSourceEnumerable)
             {
@@ -111,7 +84,19 @@ namespace MemberMapper.Core.Implementations
             }
             else
             {
+              var complexPair = new TypePair(typeOfSourceEnumerable, typeOfDestinationEnumerable);
 
+              ProposedTypeMapping complexTypeMapping;
+
+              if (!mappingCache.TryGetValue(complexPair, out complexTypeMapping))
+              {
+                complexTypeMapping = GetTypeMapping(complexPair, options);
+              }
+              complexTypeMapping.IsEnumerable = true;
+              complexTypeMapping.DestinationMember = match;
+              complexTypeMapping.SourceMember = property;
+
+              typeMapping.ProposedTypeMappings.Add(complexTypeMapping);
             }
 
             
@@ -140,10 +125,25 @@ namespace MemberMapper.Core.Implementations
       return typeMapping;
     }
 
+    public event Action<IMemberMap> MemberMapCreated;
+
+    private void RegisterMap(ProposedMap proposed, IMemberMap final)
+    {
+
+      if (MemberMapCreated != null)
+      {
+        MemberMapCreated(final);
+      }
+
+      proposed.MemberMapCreated -= RegisterMap;
+    }
+
     public IProposedMap CreateMap(TypePair pair, Action<PropertyInfo, IMappingOption> options = null)
     {
 
-      var map = new ProposedMap(this.Mapper);
+      var map = new ProposedMap();
+
+      map.MemberMapCreated += RegisterMap;
 
       map.SourceType = pair.SourceType;
       map.DestinationType = pair.DestinationType;

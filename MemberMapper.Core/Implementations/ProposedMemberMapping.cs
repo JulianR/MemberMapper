@@ -9,8 +9,8 @@ namespace MemberMapper.Core.Implementations
 {
   public class ProposedMemberMapping : IProposedMemberMapping
   {
-    public MemberInfo From { get; set; }
-    public MemberInfo To { get; set; }
+    public PropertyOrFieldInfo From { get; set; }
+    public PropertyOrFieldInfo To { get; set; }
 
     public override bool Equals(object obj)
     {
