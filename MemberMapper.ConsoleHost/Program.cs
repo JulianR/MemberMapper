@@ -7,14 +7,28 @@ using MemberMapper.Core.Implementations;
 namespace MemberMapper.ConsoleHost
 {
 
+  class Foo
+  {
+    public string Z {get;set;}
+  }
+
+  class Bar
+  {
+    public string Z { get;set;}
+  }
+
   class SourceElement
   {
     public int X { get; set; }
+
+    public List<Foo> Collection { get; set; }
   }
 
   class DestinationElement
   {
     public int X { get; set; }
+
+    public List<Bar> Collection { get; set; }
   }
 
   class SourceType
@@ -46,7 +60,14 @@ namespace MemberMapper.ConsoleHost
         {
           new SourceElement
           {
-            X = 10
+            X = 10,
+            Collection = new List<Foo>
+            {
+              new Foo
+              {
+                Z = "string"
+              }
+            }
           }
         },
         Name = "X"
