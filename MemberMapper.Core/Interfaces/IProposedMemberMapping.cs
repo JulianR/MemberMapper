@@ -11,6 +11,5 @@ namespace MemberMapper.Core.Interfaces
   {
     PropertyOrFieldInfo From { get; set; }
     PropertyOrFieldInfo To { get; set; }
-    bool IsEnumerable { get; set; }
   }
 }

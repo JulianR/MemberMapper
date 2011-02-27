@@ -72,15 +72,27 @@ namespace MemberMapper.Core.Implementations
 
             if (typeOfDestinationEnumerable == typeOfSourceEnumerable)
             {
-              typeMapping.ProposedMappings.Add
-              (
-                new ProposedMemberMapping
-                {
-                  From = property,
-                  To = match,
-                  IsEnumerable = true
-                }
-              );
+
+
+
+              typeMapping.ProposedTypeMappings.Add(
+                new ProposedTypeMapping
+              {
+                IsEnumerable = true,
+                DestinationMember = match,
+                SourceMember = property,
+                ProposedMappings = new List<IProposedMemberMapping>()
+              });
+
+              //typeMapping.ProposedMappings.Add
+              //(
+              //  new ProposedMemberMapping
+              //  {
+              //    From = property,
+              //    To = match,
+              //    IsEnumerable = true
+              //  }
+              //);
             }
             else
             {

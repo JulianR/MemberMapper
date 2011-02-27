@@ -51,14 +51,8 @@ namespace MemberMapper.Core.Implementations
 
       foreach (var member in typeMapping.ProposedMappings)
       {
-        if (member.IsEnumerable)
-        {
 
-        }
-        else
-        {
-          BuildNonCollectionSimpleTypeMappingExpressions(source, destination, member, expressions, newParams);
-        }
+        BuildSimpleTypeMappingExpressions(source, destination, member, expressions, newParams);
       }
 
       foreach (var complexTypeMapping in typeMapping.ProposedTypeMappings)
@@ -76,7 +70,7 @@ namespace MemberMapper.Core.Implementations
 
     }
 
-    private static void BuildNonCollectionSimpleTypeMappingExpressions(ParameterExpression source, ParameterExpression destination, IProposedMemberMapping member, List<Expression> expressions, List<ParameterExpression> newParams)
+    private static void BuildSimpleTypeMappingExpressions(ParameterExpression source, ParameterExpression destination, IProposedMemberMapping member, List<Expression> expressions, List<ParameterExpression> newParams)
     {
       var sourceMember = Expression.PropertyOrField(source, member.From.Name);
       var destMember = Expression.PropertyOrField(destination, member.To.Name);
@@ -85,73 +79,6 @@ namespace MemberMapper.Core.Implementations
 
       expressions.Add(assignSourceToDest);
     }
-
-    //private static LoopExpression MakeForeach(
-    //  PropertyOrFieldInfo member, 
-    //  ParameterExpression sourceCollection, 
-    //  ParameterExpression destinationCollection,
-    //  ParameterExpression valueToAddToCollection,
-    //  IList<Expression> expressionsInsideLoop,
-    //  List<ParameterExpression> newParams
-
-    //  )
-    //{
-    //  var collectionType = member.PropertyOrFieldType;
-
-    //  if (typeof(IList).IsAssignableFrom(collectionType))
-    //  {
-    //    var iteratorVar = Expression.Parameter(typeof(int), "i");
-
-    //    newParams.Add(iteratorVar);
-
-    //    var assignZeroToIteratorVar = Expression.Assign(iteratorVar, Expression.Constant(0));
-
-    //    MemberExpression accessCollectionSize;
-
-    //    if(collectionType.IsArray)
-    //    { 
-    //      accessCollectionSize = Expression.Property(sourceCollection, "Length");
-    //    }
-    //    else
-    //    {
-    //      accessCollectionSize = Expression.Property(sourceCollection, "Count");
-    //    }
-
-    //    var terminationCondition = Expression.LessThan(iteratorVar, accessCollectionSize);
-
-    //    var increment = Expression.Increment(iteratorVar);
-
-    //    if (collectionType.IsArray)
-    //    {
-    //      //var createNewArray = Expression.New(
-    //    }
-    //    else
-    //    {
-    //      var addMethod = destinationCollectionType.GetMethod("Add", new[] { destinationCollectionElementType });
-
-    //      var callAddOnDestinationCollection = Expression.Call(destinationCollection, addMethod, destinationCollectionItem);
-
-    //      expressionsInsideLoop.Add(callAddOnDestinationCollection);
-
-    //    }
-
-    //    expressionsInsideLoop.Add(increment);
-
-    //    var body = Expression.Block(expressionsInsideLoop);
-
-    //    var @break = Expression.Label();
-
-    //    return Expression.Loop(
-    //                  Expression.IfThenElse(
-    //                  terminationCondition,
-    //                      body
-    //                  , Expression.Break(@break)), @break);
-
-    //  }
-    //  else
-    //  {
-    //  }
-    //}
 
     private static void BuildCollectionComplexTypeMappingExpressions(ParameterExpression source, ParameterExpression destination, IProposedTypeMapping complexTypeMapping, List<Expression> expressions, List<ParameterExpression> newParams)
     {
@@ -162,19 +89,72 @@ namespace MemberMapper.Core.Implementations
 
       var sourceCollectionElementType = CollectionTypeHelper.GetTypeInsideEnumerable(complexTypeMapping.SourceMember);
 
-      var destinationCollectionType = typeof(List<>).MakeGenericType(destinationCollectionElementType);
+      var sourceElementSameAsDestination = destinationCollectionElementType == sourceCollectionElementType;
 
-      var createDestinationCollection = Expression.New(destinationCollectionType);
-
-      var destinationCollection = Expression.Parameter(destinationCollectionType, GetCollectionName());
-
-      newParams.Add(destinationCollection);
-
-      var assignNewCollectionToDestination = Expression.Assign(destinationCollection, createDestinationCollection);
-
-      ifNotNullBlock.Add(assignNewCollectionToDestination);
+      Type destinationCollectionType;
+      ParameterExpression destinationCollection;
 
       var accessSourceCollection = Expression.MakeMemberAccess(source, complexTypeMapping.SourceMember);
+
+      Expression accessSourceCollectionSize;
+
+      if (complexTypeMapping.SourceMember.PropertyOrFieldType.IsArray)
+      {
+        accessSourceCollectionSize = Expression.Property(accessSourceCollection, "Length");
+      }
+      else
+      {
+
+        var genericCollection = typeof(ICollection<>).MakeGenericType(sourceCollectionElementType);
+
+        if (genericCollection.IsAssignableFrom(complexTypeMapping.SourceMember.PropertyOrFieldType))
+        {
+          var countProperty = genericCollection.GetProperty("Count");
+
+          accessSourceCollectionSize = Expression.Property(accessSourceCollection, countProperty);
+        }
+        else
+        {
+
+          var countMethod = (from m in typeof(Enumerable).GetMethods()
+                             where m.Name == "Count" && m.IsGenericMethod
+                             && m.GetParameters().Length == 1
+                             select m).FirstOrDefault();
+
+          var genericEnumerable = typeof(IEnumerable<>).MakeGenericType(sourceCollectionElementType);
+
+          accessSourceCollectionSize = Expression.Call(null, countMethod.MakeGenericMethod(sourceCollectionElementType), accessSourceCollection);
+        }
+      }
+
+      if (complexTypeMapping.DestinationMember.PropertyOrFieldType.IsArray)
+      {
+        destinationCollectionType = complexTypeMapping.DestinationMember.PropertyOrFieldType;
+
+        destinationCollection = Expression.Parameter(destinationCollectionType, GetCollectionName());
+
+        newParams.Add(destinationCollection);
+
+        var createDestinationCollection = Expression.New(destinationCollectionType.GetConstructors().Single(), accessSourceCollectionSize);
+
+        var assignNewCollectionToDestination = Expression.Assign(destinationCollection, createDestinationCollection);
+
+        ifNotNullBlock.Add(assignNewCollectionToDestination);
+      }
+      else
+      {
+        destinationCollectionType = typeof(List<>).MakeGenericType(destinationCollectionElementType);
+
+        var createDestinationCollection = Expression.New(destinationCollectionType);
+
+        destinationCollection = Expression.Parameter(destinationCollectionType, GetCollectionName());
+
+        newParams.Add(destinationCollection);
+
+        var assignNewCollectionToDestination = Expression.Assign(destinationCollection, createDestinationCollection);
+
+        ifNotNullBlock.Add(assignNewCollectionToDestination);
+      }
 
       var sourceCollectionItem = Expression.Parameter(sourceCollectionElementType, GetCollectionElementName());
 
@@ -182,44 +162,59 @@ namespace MemberMapper.Core.Implementations
 
       var destinationCollectionItem = Expression.Parameter(destinationCollectionElementType, GetCollectionElementName());
 
-      var createNewDestinationCollectionItem = Expression.New(destinationCollectionElementType);
+      BinaryExpression assignNewItemToDestinationItem;
 
+      if (!sourceElementSameAsDestination)
+      {
+        var createNewDestinationCollectionItem = Expression.New(destinationCollectionElementType);
+        assignNewItemToDestinationItem = Expression.Assign(destinationCollectionItem, createNewDestinationCollectionItem);
+      }
+      else
+      {
+        assignNewItemToDestinationItem = Expression.Assign(destinationCollectionItem, sourceCollectionItem);
+      }
       newParams.Add(sourceCollectionItem);
       newParams.Add(destinationCollectionItem);
 
       var @break = Expression.Label();
 
+      var iteratorVar = Expression.Parameter(typeof(int), GetIteratorVarName());
 
-      var assignNewItemToDestinationItem = Expression.Assign(destinationCollectionItem, createNewDestinationCollectionItem);
+      var increment = Expression.PostIncrementAssign(iteratorVar);
+
+      Expression assignItemToDestination;
+
+      if (destinationCollectionType.IsArray)
+      {
+        var accessDestinationCollectionByIndex = Expression.MakeIndex(destinationCollection, null, new[] { iteratorVar });
+
+        var assignDestinationItemToArray = Expression.Assign(accessDestinationCollectionByIndex, destinationCollectionItem);
+
+        assignItemToDestination = assignDestinationItemToArray;
+      }
+      else
+      {
+        var addMethod = destinationCollectionType.GetMethod("Add", new[] { destinationCollectionElementType });
+        var callAddOnDestinationCollection = Expression.Call(destinationCollection, addMethod, destinationCollectionItem);
+
+        assignItemToDestination = callAddOnDestinationCollection;
+
+      }
 
       if (typeof(IList).IsAssignableFrom(complexTypeMapping.SourceMember.PropertyOrFieldType)
         || (complexTypeMapping.SourceMember.PropertyOrFieldType.IsGenericType && typeof(IList<>).IsAssignableFrom(complexTypeMapping.SourceMember.PropertyOrFieldType.GetGenericTypeDefinition())))
       {
 
-        var iteratorVar = Expression.Parameter(typeof(int), GetIteratorVarName());
 
         newParams.Add(iteratorVar);
 
         var assignZeroToIteratorVar = Expression.Assign(iteratorVar, Expression.Constant(0));
 
-        MemberExpression accessCollectionSize;
-
-        if (complexTypeMapping.SourceMember.PropertyOrFieldType.IsArray)
-        {
-          accessCollectionSize = Expression.Property(accessSourceCollection, "Length");
-        }
-        else
-        {
-          accessCollectionSize = Expression.Property(accessSourceCollection, typeof(ICollection<>).GetProperty("Count"));
-        }
-
-        var terminationCondition = Expression.LessThan(iteratorVar, accessCollectionSize);
-
-        var increment = Expression.PostIncrementAssign(iteratorVar);
+        var terminationCondition = Expression.LessThan(iteratorVar, accessSourceCollectionSize);
 
         var indexer = complexTypeMapping.SourceMember.PropertyOrFieldType.GetProperties().FirstOrDefault(p => p.GetIndexParameters().Length == 1);
 
-        var accessSourceCollectionByIndex = Expression.MakeIndex(accessSourceCollection, indexer, new[]{iteratorVar});
+        var accessSourceCollectionByIndex = Expression.MakeIndex(accessSourceCollection, indexer, new[] { iteratorVar });
 
         var assignCurrent = Expression.Assign(sourceCollectionItem, accessSourceCollectionByIndex);
 
@@ -229,15 +224,7 @@ namespace MemberMapper.Core.Implementations
 
         BuildTypeMappingExpressions(sourceCollectionItem, destinationCollectionItem, complexTypeMapping, expressionsInsideLoop, newParams);
 
-        if (destinationCollectionType.IsArray)
-        {
-        }
-        else
-        {
-          var addMethod = destinationCollectionType.GetMethod("Add", new[] { destinationCollectionElementType });
-          var callAddOnDestinationCollection = Expression.Call(destinationCollection, addMethod, destinationCollectionItem);
-          expressionsInsideLoop.Add(callAddOnDestinationCollection);
-        }
+        expressionsInsideLoop.Add(assignItemToDestination);
 
         expressionsInsideLoop.Add(increment);
 
@@ -260,6 +247,11 @@ namespace MemberMapper.Core.Implementations
 
         var sourceEnumerator = Expression.Parameter(sourceEnumeratorType, GetEnumeratorName());
 
+        if (complexTypeMapping.DestinationMember.PropertyOrFieldType.IsArray)
+        {
+          newParams.Add(iteratorVar);
+        }
+
         newParams.Add(sourceEnumerator);
 
         var doMoveNextCall = Expression.Call(sourceEnumerator, typeof(IEnumerator).GetMethod("MoveNext"));
@@ -275,11 +267,12 @@ namespace MemberMapper.Core.Implementations
 
         BuildTypeMappingExpressions(sourceCollectionItem, destinationCollectionItem, complexTypeMapping, expressionsInsideLoop, newParams);
 
-        var addMethod = destinationCollectionType.GetMethod("Add", new[] { destinationCollectionElementType });
+        expressionsInsideLoop.Add(assignItemToDestination);
 
-        var callAddOnDestinationCollection = Expression.Call(destinationCollection, addMethod, destinationCollectionItem);
-
-        expressionsInsideLoop.Add(callAddOnDestinationCollection);
+        if (complexTypeMapping.DestinationMember.PropertyOrFieldType.IsArray)
+        {
+          expressionsInsideLoop.Add(increment);
+        }
 
         var blockInsideLoop = Expression.Block(expressionsInsideLoop);
 

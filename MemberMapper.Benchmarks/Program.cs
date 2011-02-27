@@ -10,25 +10,57 @@ namespace MemberMapper.Benchmarks
 {
   class Program
   {
+
+    private static Func<ComplexSourceType, ComplexDestinationType, ComplexDestinationType> GetFunc()
+    {
+      return (src, dest) =>
+      {
+        dest.ID = src.ID;
+        if (src.Complex != null)
+        {
+          var complexSource = src.Complex;
+          var complexDestination = new NestedDestinationType();
+          complexDestination.ID = complexSource.ID;
+          complexDestination.Name = complexSource.Name;
+          dest.Complex = complexDestination;
+        }
+        return dest;
+      };
+    }
     static void Main(string[] args)
     {
 
+      //var mapper = new DefaultMemberMapper();
 
-      var param = Expression.Parameter(typeof(int), "i");
+      //var map = mapper.CreateMap(typeof(ComplexSourceType), typeof(ComplexDestinationType)).FinalizeMap();
 
-      var outerBlockParams = new List<ParameterExpression>();
+      //var func = (Func<ComplexSourceType, ComplexDestinationType, ComplexDestinationType>)map.MappingFunction;
 
-      outerBlockParams.Add(param);
 
-      var innerBlock = Expression.Block(Expression.Assign(param, Expression.Constant(1)));
+      //var func = GetFunc();
 
-      var outerBlock = Expression.Block(outerBlockParams, innerBlock);
+      //Console.ReadLine();
+      //var param = Expression.Parameter(typeof(int), "i");
 
-      var lambda = Expression.Lambda<Action>(outerBlock);
+      //var outerBlockParams = new List<ParameterExpression>();
+
+      //outerBlockParams.Add(param);
+
+      //var innerBlock = Expression.Block(Expression.Assign(param, Expression.Constant(1)));
+
+      //var outerBlock = Expression.Block(outerBlockParams, innerBlock);
+
+      //var lambda = Expression.Lambda<Action>(outerBlock);
 
       Benchmark();
       Console.WriteLine();
       Benchmark();
+      //Console.WriteLine();
+      //Benchmark();
+      //Console.WriteLine();
+      //Benchmark();
+      //Console.WriteLine();
+      //Benchmark();
 
       //Foobar();
       //Console.WriteLine();
@@ -298,14 +330,13 @@ namespace MemberMapper.Benchmarks
         Foo = new ComplexDestinationType();
 
         Foo.ID = source.ID;
-
-        if(source.Complex != null)
+        if (source.Complex != null)
         {
-          Foo.Complex = new NestedDestinationType
-          {
-            ID = source.Complex.ID + i,
-            Name = source.Complex.Name
-          };
+          var complexSource = source.Complex;
+          var complexDestination = new NestedDestinationType();
+          complexDestination.ID = complexSource.ID;
+          complexDestination.Name = complexSource.Name;
+          Foo.Complex = complexDestination;
         }
       }
 

@@ -35,14 +35,14 @@ namespace MemberMapper.ConsoleHost
   {
     public int ID { get; set; }
     public string Name { get; set; }
-    public List<SourceElement> IDs { get; set; }
+    public IList<SourceElement> IDs { get; set; }
   }
 
   class DestinationType
   {
     public int ID { get; set; }
     public string Name { get; set; }
-    public List<DestinationElement> IDs { get; set; }
+    public IEnumerable<DestinationElement> IDs { get; set; }
   }
 
   class Program

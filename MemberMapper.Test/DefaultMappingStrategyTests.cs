@@ -219,7 +219,7 @@ namespace MemberMapper.Test
 
       var proposition = mapper.CreateMap(typeof(ListSourceType), typeof(ListDestinationType));
 
-      Assert.IsTrue(proposition.ProposedTypeMapping.ProposedMappings.Any(p => !p.IsEnumerable));
+      Assert.IsFalse(proposition.ProposedTypeMapping.IsEnumerable);
     }
 
     [TestMethod]
@@ -229,7 +229,7 @@ namespace MemberMapper.Test
 
       var proposition = mapper.CreateMap(typeof(IEnumerableSourceType), typeof(ListDestinationType));
 
-      Assert.IsTrue(proposition.ProposedTypeMapping.ProposedMappings.Any(p => p.IsEnumerable));
+      Assert.IsFalse(proposition.ProposedTypeMapping.IsEnumerable);
 
     }
 
@@ -240,7 +240,7 @@ namespace MemberMapper.Test
 
       var proposition = mapper.CreateMap(typeof(IEnumerableSourceType), typeof(ArrayDestinationType));
 
-      Assert.IsTrue(proposition.ProposedTypeMapping.ProposedMappings.Any(p => p.IsEnumerable));
+      Assert.IsFalse(proposition.ProposedTypeMapping.IsEnumerable);
     }
 
     private class SourceElementType
