@@ -12,6 +12,94 @@ namespace MemberMapper.Core.Implementations
   {
     private Dictionary<TypePair, ProposedTypeMapping> mappingCache = new Dictionary<TypePair, ProposedTypeMapping>();
 
+    private void HandleMappingForMembers(ProposedTypeMapping typeMapping, PropertyOrFieldInfo property, PropertyOrFieldInfo match, Action<MemberInfo, IMappingOption> options = null)
+    {
+      if (match != null && match.PropertyOrFieldType.IsAssignableFrom(property.PropertyOrFieldType))
+      {
+
+        if (options != null)
+        {
+          var option = new MappingOption();
+
+          options(match, option);
+
+          switch (option.State)
+          {
+            case MappingOptionState.Ignored:
+              return;
+          }
+
+        }
+
+        typeMapping.ProposedMappings.Add
+        (
+          new ProposedMemberMapping
+          {
+            From = property,
+            To = match
+          }
+        );
+      }
+      else if (match != null)
+      {
+
+        if (typeof(IEnumerable).IsAssignableFrom(property.PropertyOrFieldType)
+          && typeof(IEnumerable).IsAssignableFrom(match.PropertyOrFieldType))
+        {
+
+          var typeOfSourceEnumerable = CollectionTypeHelper.GetTypeInsideEnumerable(property);
+          var typeOfDestinationEnumerable = CollectionTypeHelper.GetTypeInsideEnumerable(match);
+
+          if (typeOfDestinationEnumerable == typeOfSourceEnumerable)
+          {
+
+            typeMapping.ProposedTypeMappings.Add(
+              new ProposedTypeMapping
+              {
+                IsEnumerable = true,
+                DestinationMember = match,
+                SourceMember = property,
+                ProposedMappings = new List<IProposedMemberMapping>()
+              });
+          }
+          else
+          {
+            var complexPair = new TypePair(typeOfSourceEnumerable, typeOfDestinationEnumerable);
+
+            ProposedTypeMapping complexTypeMapping;
+
+            if (!mappingCache.TryGetValue(complexPair, out complexTypeMapping))
+            {
+              complexTypeMapping = GetTypeMapping(complexPair, options);
+            }
+            complexTypeMapping.IsEnumerable = true;
+            complexTypeMapping.DestinationMember = match;
+            complexTypeMapping.SourceMember = property;
+
+            typeMapping.ProposedTypeMappings.Add(complexTypeMapping);
+          }
+
+
+        }
+        else
+        {
+          var complexPair = new TypePair(property.PropertyOrFieldType, match.PropertyOrFieldType);
+
+          ProposedTypeMapping complexTypeMapping;
+
+          if (!mappingCache.TryGetValue(complexPair, out complexTypeMapping))
+          {
+            complexTypeMapping = GetTypeMapping(complexPair, options);
+          }
+
+          complexTypeMapping.DestinationMember = match;
+          complexTypeMapping.SourceMember = property;
+
+          typeMapping.ProposedTypeMappings.Add(complexTypeMapping);
+        }
+      }
+    }
+
     private ProposedTypeMapping GetTypeMapping(TypePair pair, Action<PropertyInfo, IMappingOption> options = null)
     {
 
@@ -111,7 +199,7 @@ namespace MemberMapper.Core.Implementations
               typeMapping.ProposedTypeMappings.Add(complexTypeMapping);
             }
 
-            
+
           }
           else
           {
