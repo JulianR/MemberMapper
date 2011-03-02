@@ -66,6 +66,14 @@ namespace MemberMapper.ConsoleHost
               new Foo
               {
                 Z = "string"
+              },
+              new Foo
+              {
+                Z = "string1"
+              },
+              new Foo
+              {
+                Z = "string2"
               }
             }
           }

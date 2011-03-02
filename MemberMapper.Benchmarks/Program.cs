@@ -5,10 +5,12 @@ using System.Text;
 using MemberMapper.Core.Implementations;
 using System.Diagnostics;
 using System.Linq.Expressions;
+using System.Reflection;
+using System.Reflection.Emit;
 
 namespace MemberMapper.Benchmarks
 {
-  class Program
+  public class Program
   {
 
     private static Func<ComplexSourceType, ComplexDestinationType, ComplexDestinationType> GetFunc()
@@ -55,12 +57,6 @@ namespace MemberMapper.Benchmarks
       Benchmark();
       Console.WriteLine();
       Benchmark();
-      //Console.WriteLine();
-      //Benchmark();
-      //Console.WriteLine();
-      //Benchmark();
-      //Console.WriteLine();
-      //Benchmark();
 
       //Foobar();
       //Console.WriteLine();
@@ -380,6 +376,7 @@ namespace MemberMapper.Benchmarks
       sw.Stop();
 
       Console.WriteLine(sw.Elapsed);
+
     }
   }
 }
