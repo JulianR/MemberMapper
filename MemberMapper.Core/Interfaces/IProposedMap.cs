@@ -15,6 +15,6 @@ namespace MemberMapper.Core.Interfaces
 
   public interface IProposedMap<TSource, TDestination> : IProposedMap
   {
-    IProposedMap<TSource, TDestination> AddExpression(Expression<Func<TSource, object>> source, Expression<Func<TDestination, object>> destination);
+    IProposedMap<TSource, TDestination> AddExpression<TSourceReturn, TDestinationReturn>(Expression<Func<TSource, TSourceReturn>> source, Expression<Func<TDestination, TDestinationReturn>> destination) where TDestinationReturn : TSourceReturn;
   }
 }

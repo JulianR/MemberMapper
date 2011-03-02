@@ -40,12 +40,33 @@ namespace MemberMapper.Core.Implementations
 
     public TDestination Map<TSource, TDestination>(TSource source) where TDestination : new()
     {
-      var destination = new TDestination();
+      TDestination destination = default(TDestination);
+
+      if (source != null)
+      {
+        destination = new TDestination();
+      }
 
       return Map(source, destination);
     }
 
-    public IProposedMap CreateMap(Type source, Type destination, Action<System.Reflection.PropertyInfo, IMappingOption> options = null)
+    public IProposedMap<TSource, TDestination> CreateMap<TSource, TDestination>(MappingOptions options = null)
+    {
+      IMemberMap map;
+
+      var pair = new TypePair(typeof(TSource), typeof(TDestination));
+
+      if (!this.maps.TryGetValue(pair, out map))
+      {
+        var proposedMap = this.MappingStrategy.CreateMap<TSource, TDestination>(options);
+
+        return proposedMap;
+      }
+
+      return map.ToGeneric<TSource, TDestination>();
+    }
+
+    public IProposedMap CreateMap(Type source, Type destination, MappingOptions options = null)
     {
       IMemberMap map;
 
@@ -91,6 +112,7 @@ namespace MemberMapper.Core.Implementations
     }
 
     public IMappingStrategy MappingStrategy { get; set; }
+
 
   }
 }

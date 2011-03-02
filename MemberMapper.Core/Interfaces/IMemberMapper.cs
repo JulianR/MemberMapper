@@ -18,7 +18,9 @@ namespace MemberMapper.Core.Interfaces
 
     TDestination Map<TSource, TDestination>(TSource source, TDestination destination);
 
-    IProposedMap CreateMap(Type source, Type destination, Action<PropertyInfo, IMappingOption> options = null);
+    IProposedMap CreateMap(Type source, Type destination, MappingOptions options = null);
+
+    IProposedMap<TSource, TDestination> CreateMap<TSource, TDestination>(MappingOptions options = null);
 
     void RegisterMap(IMemberMap map);
 

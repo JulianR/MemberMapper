@@ -51,7 +51,9 @@ namespace MemberMapper.ConsoleHost
     {
       var mapper = new DefaultMemberMapper();
 
-      var map = mapper.CreateMap(typeof(SourceType), typeof(DestinationType)).FinalizeMap();
+      var map = mapper.CreateMap<SourceType, DestinationType>().AddExpression(s => s.ID, d => int.Parse(d.Name));
+
+      //var map = mapper.CreateMap(typeof(SourceType), typeof(DestinationType)).FinalizeMap();
 
       var source = new SourceType
       {

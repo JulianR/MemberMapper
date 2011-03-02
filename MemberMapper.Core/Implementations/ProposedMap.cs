@@ -22,37 +22,38 @@ namespace MemberMapper.Core.Implementations
 
     public event Action<ProposedMap, IMemberMap> MemberMapCreated;
 
-    private static string GetParameterName(PropertyOrFieldInfo member)
+    private int currentID = 1;
+
+    private string GetParameterName(PropertyOrFieldInfo member)
     {
-      return member.Name + "#" + ((uint)Guid.NewGuid().GetHashCode());
+      return member.Name + "#" + currentID++;
     }
 
-    private static string GetCollectionName()
+    private string GetCollectionName()
     {
-      return "collection#" + ((uint)Guid.NewGuid().GetHashCode());
+      return "collection#" + currentID++;
     }
 
-    private static string GetEnumeratorName()
+    private string GetEnumeratorName()
     {
-      return "enumerator#" + ((uint)Guid.NewGuid().GetHashCode());
+      return "enumerator#" + currentID++;
     }
 
-    private static string GetCollectionElementName()
+    private string GetCollectionElementName()
     {
-      return "item#" + ((uint)Guid.NewGuid().GetHashCode());
+      return "item#" + currentID++;
     }
 
-    private static string GetIteratorVarName()
+    private string GetIteratorVarName()
     {
-      return "i#" + ((uint)Guid.NewGuid().GetHashCode());
+      return "i#" + currentID++;
     }
 
-    private static void BuildTypeMappingExpressions(ParameterExpression source, ParameterExpression destination, IProposedTypeMapping typeMapping, List<Expression> expressions, List<ParameterExpression> newParams)
+    private void BuildTypeMappingExpressions(ParameterExpression source, ParameterExpression destination, IProposedTypeMapping typeMapping, List<Expression> expressions, List<ParameterExpression> newParams)
     {
 
       foreach (var member in typeMapping.ProposedMappings)
       {
-
         BuildSimpleTypeMappingExpressions(source, destination, member, expressions, newParams);
       }
 
@@ -71,7 +72,7 @@ namespace MemberMapper.Core.Implementations
 
     }
 
-    private static void BuildSimpleTypeMappingExpressions(ParameterExpression source, ParameterExpression destination, IProposedMemberMapping member, List<Expression> expressions, List<ParameterExpression> newParams)
+    private void BuildSimpleTypeMappingExpressions(ParameterExpression source, ParameterExpression destination, IProposedMemberMapping member, List<Expression> expressions, List<ParameterExpression> newParams)
     {
       var sourceMember = Expression.PropertyOrField(source, member.From.Name);
       var destMember = Expression.PropertyOrField(destination, member.To.Name);
@@ -81,7 +82,7 @@ namespace MemberMapper.Core.Implementations
       expressions.Add(assignSourceToDest);
     }
 
-    private static void BuildCollectionComplexTypeMappingExpressions(ParameterExpression source, ParameterExpression destination, IProposedTypeMapping complexTypeMapping, List<Expression> expressions, List<ParameterExpression> newParams)
+    private void BuildCollectionComplexTypeMappingExpressions(ParameterExpression source, ParameterExpression destination, IProposedTypeMapping complexTypeMapping, List<Expression> expressions, List<ParameterExpression> newParams)
     {
 
       var ifNotNullBlock = new List<Expression>();
@@ -299,7 +300,7 @@ namespace MemberMapper.Core.Implementations
 
     }
 
-    private static void BuildNonCollectionComplexTypeMappingExpressions(ParameterExpression source, ParameterExpression destination, IProposedTypeMapping complexTypeMapping, List<Expression> expressions, List<ParameterExpression> newParams)
+    private void BuildNonCollectionComplexTypeMappingExpressions(ParameterExpression source, ParameterExpression destination, IProposedTypeMapping complexTypeMapping, List<Expression> expressions, List<ParameterExpression> newParams)
     {
 
       ParameterExpression complexSource = null, complexDest = null;
@@ -372,16 +373,20 @@ namespace MemberMapper.Core.Implementations
 
       BuildTypeMappingExpressions(right, left, this.ProposedTypeMapping, assignments, newParams);
 
-      assignments.Add(left);
+      var block = Expression.Block(assignments);
 
-      var block = Expression.Block(newParams, assignments);
+      var sourceNullCheck = Expression.NotEqual(right, Expression.Constant(null));
+
+      var ifSourceNotNull = Expression.IfThen(sourceNullCheck, block);
+
+      var outerBlock = Expression.Block(newParams, ifSourceNotNull, left);
 
       var funcType = typeof(Func<,,>).MakeGenericType(this.SourceType, this.DestinationType, this.DestinationType);
 
       var lambda = Expression.Lambda
       (
         funcType,
-        block,
+        outerBlock,
         right, left
       );
 
@@ -405,14 +410,9 @@ namespace MemberMapper.Core.Implementations
 
   public class ProposedMap<TSource, TDestination> : ProposedMap, IProposedMap<TSource, TDestination>
   {
-
-    #region IProposedMap<TSource,TDestination> Members
-
-    public IProposedMap<TSource, TDestination> AddExpression(Expression<Func<TSource, object>> source, Expression<Func<TDestination, object>> destination)
+    public IProposedMap<TSource, TDestination> AddExpression<TSourceReturn, TDestinationReturn>(Expression<Func<TSource, TSourceReturn>> source, Expression<Func<TDestination, TDestinationReturn>> destination) where TDestinationReturn : TSourceReturn
     {
       throw new NotImplementedException();
     }
-
-    #endregion
   }
 }

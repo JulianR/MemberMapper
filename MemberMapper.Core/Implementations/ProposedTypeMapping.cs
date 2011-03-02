@@ -24,9 +24,6 @@ namespace MemberMapper.Core.Implementations
 
     public IList<IProposedMemberMapping> ProposedMappings { get; set; }
 
-    #region IProposedTypeMapping Members
-
-
     public ProposedTypeMapping Clone()
     {
       return new ProposedTypeMapping
@@ -38,7 +35,5 @@ namespace MemberMapper.Core.Implementations
         IsEnumerable = this.IsEnumerable
       };
     }
-
-    #endregion
   }
 }

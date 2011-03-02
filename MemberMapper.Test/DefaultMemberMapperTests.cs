@@ -173,9 +173,9 @@ namespace MemberMapper.Test
       var mapper = new DefaultMemberMapper();
 
       var proposed = mapper.CreateMap(typeof(ComplexSourceType), typeof(ComplexDestinationType),
-      (p, option) =>
+      (s, p, option) =>
       {
-        if (p.Name == "Name")
+        if (s.Name == "Name")
         {
           option.IgnoreMember();
         }
@@ -207,9 +207,9 @@ namespace MemberMapper.Test
       var mapper = new DefaultMemberMapper();
 
       var proposed = mapper.CreateMap(typeof(NestedSourceType), typeof(NestedDestinationType),
-      (p, option) =>
+      (s, p, option) =>
       {
-        if (p.Name == "Name")
+        if (s.Name == "Name")
         {
           option.IgnoreMember();
         }

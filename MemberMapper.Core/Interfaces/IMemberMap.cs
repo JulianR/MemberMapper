@@ -12,5 +12,11 @@ namespace MemberMapper.Core.Interfaces
 
     Delegate MappingFunction { get; set; }
 
+    IMemberMap<TSource, TDestination> ToGeneric<TSource, TDestination>();
+
+  }
+
+  public interface IMemberMap<TSource, TDestination> : IProposedMap<TSource, TDestination>
+  {
   }
 }

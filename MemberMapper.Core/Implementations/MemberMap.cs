@@ -39,5 +39,25 @@ namespace MemberMapper.Core.Implementations
     }
 
     #endregion
+
+    public IMemberMap<TSource, TDestination> ToGeneric<TSource, TDestination>()
+    {
+      var map = new MemberMap<TSource, TDestination>();
+
+      map.DestinationType = this.DestinationType;
+      map.SourceType = this.SourceType;
+      map.MappingFunction = this.MappingFunction;
+
+      return map;
+    }
+  }
+
+  public class MemberMap<TSource, TDestination> : MemberMap, IMemberMap<TSource, TDestination>
+  {
+
+    public IProposedMap<TSource, TDestination> AddExpression<TSourceReturn, TDestinationReturn>(System.Linq.Expressions.Expression<Func<TSource, TSourceReturn>> source, System.Linq.Expressions.Expression<Func<TDestination, TDestinationReturn>> destination) where TDestinationReturn : TSourceReturn
+    {
+      throw new NotImplementedException();
+    }
   }
 }

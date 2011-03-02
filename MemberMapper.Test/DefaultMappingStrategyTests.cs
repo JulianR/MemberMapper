@@ -159,9 +159,9 @@ namespace MemberMapper.Test
 
       var proposition = mapper.MappingStrategy.CreateMap(
         new TypePair(typeof(Poco_From), typeof(Poco_To)),
-        (p, option) =>
+        (s, m, option) =>
         {
-          if (p.Name == "ID")
+          if (s.Name == "ID")
           {
             option.IgnoreMember();
           }
