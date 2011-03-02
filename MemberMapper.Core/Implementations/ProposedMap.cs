@@ -6,6 +6,7 @@ using MemberMapper.Core.Interfaces;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Collections;
+using System.Reflection.Emit;
 
 namespace MemberMapper.Core.Implementations
 {
@@ -328,6 +329,38 @@ namespace MemberMapper.Core.Implementations
 
     }
 
+    private static ModuleBuilder moduleBuilder;
+
+    private static Delegate CompileExpression(Type sourceType, Type destinationType, LambdaExpression expression)
+    {
+      if ((sourceType.IsPublic || sourceType.IsNestedPublic) && (destinationType.IsPublic || destinationType.IsNestedPublic))
+      {
+        if (moduleBuilder == null)
+        {
+          var assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(new AssemblyName("MemberMapperFunctionsAssembly_" + Guid.NewGuid().ToString("N")), AssemblyBuilderAccess.Run);
+
+          moduleBuilder = assemblyBuilder.DefineDynamicModule("Module");
+        }
+
+        var typeBuilder = moduleBuilder.DefineType(string.Format("From_{0}_to_{1}_{2}", sourceType.Name, destinationType.Name, Guid.NewGuid().ToString("N"), TypeAttributes.Public));
+
+        var methodBuilder = typeBuilder.DefineMethod("Map", MethodAttributes.Public | MethodAttributes.Static);
+
+        expression.CompileToMethod(methodBuilder);
+
+        var resultingType = typeBuilder.CreateType();
+
+        var function = Delegate.CreateDelegate(expression.Type, resultingType.GetMethod("Map"));
+
+        return function;
+      }
+      else
+      {
+        return expression.Compile();
+      }
+
+    }
+
     public IMemberMap FinalizeMap()
     {
       var left = Expression.Parameter(DestinationType, "left");
@@ -343,9 +376,11 @@ namespace MemberMapper.Core.Implementations
 
       var block = Expression.Block(newParams, assignments);
 
+      var funcType = typeof(Func<,,>).MakeGenericType(this.SourceType, this.DestinationType, this.DestinationType);
+
       var lambda = Expression.Lambda
       (
-        typeof(Func<,,>).MakeGenericType(this.SourceType, this.DestinationType, this.DestinationType),
+        funcType,
         block,
         right, left
       );
@@ -354,7 +389,7 @@ namespace MemberMapper.Core.Implementations
 
       map.SourceType = this.SourceType;
       map.DestinationType = this.DestinationType;
-      map.MappingFunction = lambda.Compile();
+      map.MappingFunction = CompileExpression(this.SourceType, this.DestinationType, lambda);
 
       if (MemberMapCreated != null)
       {
