@@ -13,7 +13,7 @@ namespace MemberMapper.Core.Implementations
     private Dictionary<TypePair, ProposedTypeMapping> mappingCache = new Dictionary<TypePair, ProposedTypeMapping>();
 
     private byte[] syncRoot = new byte[0];
-    private void HandleMappingForMembers(ProposedTypeMapping typeMapping, PropertyOrFieldInfo property, PropertyOrFieldInfo match, Action<MemberInfo, IMappingOption> options = null)
+    private void HandleMappingForMembers(ProposedTypeMapping typeMapping, PropertyOrFieldInfo property, PropertyOrFieldInfo match, MappingOptions options = null)
     {
       if (match != null && match.PropertyOrFieldType.IsAssignableFrom(property.PropertyOrFieldType))
       {
@@ -22,7 +22,7 @@ namespace MemberMapper.Core.Implementations
         {
           var option = new MappingOption();
 
-          options(match, option);
+          options(property, match, option);
 
           switch (option.State)
           {

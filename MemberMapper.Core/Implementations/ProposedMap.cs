@@ -332,9 +332,38 @@ namespace MemberMapper.Core.Implementations
 
     private static ModuleBuilder moduleBuilder;
 
+    private static bool IsPublicClass(Type t)
+    {
+
+      if((!t.IsPublic && !t.IsNestedPublic) || t.IsGenericType)
+      {
+        return false;
+      }
+
+      int lastIndex = t.FullName.LastIndexOf('+');
+
+      if (lastIndex > 0)
+      {
+        var containgTypeName = t.FullName.Substring(0, lastIndex);
+
+        var containingType = Type.GetType(containgTypeName + "," + t.Assembly);
+
+        if (containingType != null)
+        {
+          return containingType.IsPublic;
+        }
+
+        return false;
+      }
+      else
+      {
+        return t.IsPublic;
+      }
+    }
+
     private static Delegate CompileExpression(Type sourceType, Type destinationType, LambdaExpression expression)
     {
-      if ((sourceType.IsPublic || sourceType.IsNestedPublic) && (destinationType.IsPublic || destinationType.IsNestedPublic))
+      if (IsPublicClass(sourceType) && IsPublicClass(destinationType))
       {
         if (moduleBuilder == null)
         {
