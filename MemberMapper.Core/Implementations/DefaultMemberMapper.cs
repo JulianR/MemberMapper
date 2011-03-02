@@ -22,9 +22,20 @@ namespace MemberMapper.Core.Implementations
 
     private Dictionary<TypePair, IMemberMap> maps = new Dictionary<TypePair, IMemberMap>();
 
-    public TDestination Map<TDestination>(object source)
+    public TDestination Map<TDestination>(object source) where TDestination : new()
     {
-      throw new NotImplementedException();
+      var pair = new TypePair(source.GetType(), typeof(TDestination));
+
+      IMemberMap map;
+
+      if (!this.maps.TryGetValue(pair, out map))
+      {
+        map = MappingStrategy.CreateAndFinalizeMap(pair);
+      }
+
+      var destination = new TDestination();
+
+      return (TDestination)map.MappingFunction.DynamicInvoke(source, destination);
     }
 
     public TDestination Map<TSource, TDestination>(TSource source) where TDestination : new()

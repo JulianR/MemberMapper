@@ -10,7 +10,7 @@ namespace MemberMapper.Core.Interfaces
   {
     IMappingStrategy MappingStrategy { get; set; }
 
-    TDestination Map<TDestination>(object source);
+    TDestination Map<TDestination>(object source) where TDestination : new();
 
     TSource Map<TSource>(TSource source) where TSource : new();
 
