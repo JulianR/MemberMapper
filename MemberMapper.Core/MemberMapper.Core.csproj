@@ -51,6 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Implementations\CollectionTypeHelper.cs" />
+    <Compile Include="Implementations\MapperOptions.cs" />
     <Compile Include="Implementations\MappingOption.cs" />
     <Compile Include="Implementations\DefaultMappingStrategy.cs" />
     <Compile Include="Implementations\PropertyOrFieldInfo.cs" />

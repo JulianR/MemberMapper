@@ -9,9 +9,14 @@ namespace MemberMapper.Core.Implementations
 {
   public class DefaultMemberMapper : IMemberMapper
   {
-    public DefaultMemberMapper(IMappingStrategy strategy = null)
+
+    private readonly MapperOptions options;
+
+    public DefaultMemberMapper(MapperOptions options = null, IMappingStrategy strategy = null)
     {
       this.MappingStrategy = strategy ?? new DefaultMappingStrategy();
+
+      this.options = options ?? MapperOptions.Default;
 
       this.MappingStrategy.MemberMapCreated += map =>
       {
@@ -35,7 +40,14 @@ namespace MemberMapper.Core.Implementations
 
       var destination = new TDestination();
 
-      return (TDestination)map.MappingFunction.DynamicInvoke(source, destination);
+
+      if (options.BeforeMapping != null) options.BeforeMapping();
+
+      var result = (TDestination)map.MappingFunction.DynamicInvoke(source, destination);
+
+      if (options.AfterMapping != null) options.AfterMapping();
+
+      return result;
     }
 
     public TDestination Map<TSource, TDestination>(TSource source) where TDestination : new()
@@ -93,8 +105,14 @@ namespace MemberMapper.Core.Implementations
       {
         map = MappingStrategy.CreateAndFinalizeMap(pair);
       }
+      if (options.BeforeMapping != null) options.BeforeMapping();
 
-      return ((Func<TSource, TDestination, TDestination>)map.MappingFunction)(source, destination);
+      var result = ((Func<TSource, TDestination, TDestination>)map.MappingFunction)(source, destination);
+
+      if (options.AfterMapping != null) options.AfterMapping();
+
+      return result;
+
     }
 
 

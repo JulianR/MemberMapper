@@ -100,7 +100,7 @@ namespace MemberMapper.Test
     [TestMethod]
     public void ExpectedPropertiesWillBeMapped()
     {
-      var mapper = new DefaultMemberMapper(new DefaultMappingStrategy());
+      var mapper = new DefaultMemberMapper();
 
       var proposition = mapper.MappingStrategy.CreateMap(new TypePair(typeof(Poco_From), typeof(Poco_To)));
 
@@ -138,7 +138,7 @@ namespace MemberMapper.Test
     [TestMethod]
     public void ExpectedPropertiesFromInterfaceWillBeMapped()
     {
-      var mapper = new DefaultMemberMapper(new DefaultMappingStrategy());
+      var mapper = new DefaultMemberMapper();
 
       var proposition = mapper.MappingStrategy.CreateMap(new TypePair(typeof(IPocoOneProperty_From), typeof(PocoOneProperty_To)));
 
@@ -155,7 +155,7 @@ namespace MemberMapper.Test
     [TestMethod]
     public void IgnoringMemberIgnoresTheMember()
     {
-      var mapper = new DefaultMemberMapper(new DefaultMappingStrategy());
+      var mapper = new DefaultMemberMapper();
 
       var proposition = mapper.MappingStrategy.CreateMap(
         new TypePair(typeof(Poco_From), typeof(Poco_To)),
@@ -182,7 +182,7 @@ namespace MemberMapper.Test
     [TestMethod]
     public void FinalFunctionIsOfExpectedType()
     {
-      var mapper = new DefaultMemberMapper(new DefaultMappingStrategy());
+      var mapper = new DefaultMemberMapper();
 
       var proposition = mapper.MappingStrategy.CreateMap(new TypePair(typeof(IPocoOneProperty_From), typeof(PocoOneProperty_To)));
 
@@ -215,7 +215,7 @@ namespace MemberMapper.Test
     [TestMethod]
     public void ListIntPropertyGetsNormalMapping()
     {
-      var mapper = new DefaultMemberMapper(new DefaultMappingStrategy());
+      var mapper = new DefaultMemberMapper();
 
       var proposition = mapper.CreateMap(typeof(ListSourceType), typeof(ListDestinationType));
 
@@ -225,7 +225,7 @@ namespace MemberMapper.Test
     [TestMethod]
     public void ListIntPropertyGetsMappedToIEnumerable()
     {
-      var mapper = new DefaultMemberMapper(new DefaultMappingStrategy());
+      var mapper = new DefaultMemberMapper();
 
       var proposition = mapper.CreateMap(typeof(IEnumerableSourceType), typeof(ListDestinationType));
 
@@ -236,7 +236,7 @@ namespace MemberMapper.Test
     [TestMethod]
     public void ListIntPropertyGetsMappedToArray()
     {
-      var mapper = new DefaultMemberMapper(new DefaultMappingStrategy());
+      var mapper = new DefaultMemberMapper();
 
       var proposition = mapper.CreateMap(typeof(IEnumerableSourceType), typeof(ArrayDestinationType));
 
@@ -266,7 +266,7 @@ namespace MemberMapper.Test
     [TestMethod]
     public void ComplexListGetsMapped()
     {
-      var mapper = new DefaultMemberMapper(new DefaultMappingStrategy());
+      var mapper = new DefaultMemberMapper();
 
       var proposition = mapper.CreateMap(typeof(ListComplexSourceType), typeof(ListComplexDestinationType));
 
@@ -281,7 +281,7 @@ namespace MemberMapper.Test
     [TestMethod]
     public void ComplexListGetsMappedFromIEnumerable()
     {
-      var mapper = new DefaultMemberMapper(new DefaultMappingStrategy());
+      var mapper = new DefaultMemberMapper();
 
       var proposition = mapper.CreateMap(typeof(IEnumerableComplexSourceType), typeof(ListComplexDestinationType));
 

@@ -212,6 +212,8 @@ namespace MemberMapper.Core.Implementations
 
         var assignZeroToIteratorVar = Expression.Assign(iteratorVar, Expression.Constant(0));
 
+        ifNotNullBlock.Add(assignZeroToIteratorVar);
+
         var terminationCondition = Expression.LessThan(iteratorVar, accessSourceCollectionSize);
 
         var indexer = complexTypeMapping.SourceMember.PropertyOrFieldType.GetProperties().FirstOrDefault(p => p.GetIndexParameters().Length == 1);
