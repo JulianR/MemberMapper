@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using MemberMapper.Core.Interfaces;
 using Ninject;
+using System.Linq.Expressions;
 
 namespace MemberMapper.Core.Implementations
 {
@@ -62,7 +63,7 @@ namespace MemberMapper.Core.Implementations
       return Map(source, destination);
     }
 
-    public IProposedMap<TSource, TDestination> CreateMap<TSource, TDestination>(MappingOptions options = null)
+    public IProposedMap<TSource, TDestination> CreateMap<TSource, TDestination>(MappingOptions options = null, Expression<Func<TSource, object>> customMapping = null)
     {
       IMemberMap map;
 
@@ -70,7 +71,7 @@ namespace MemberMapper.Core.Implementations
 
       if (!this.maps.TryGetValue(pair, out map))
       {
-        var proposedMap = this.MappingStrategy.CreateMap<TSource, TDestination>(options);
+        var proposedMap = this.MappingStrategy.CreateMap<TSource, TDestination>(options,customMapping);
 
         return proposedMap;
       }

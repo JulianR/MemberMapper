@@ -5,6 +5,7 @@ using System.Text;
 using MemberMapper.Core.Interfaces;
 using System.Reflection;
 using System.Collections;
+using System.Linq.Expressions;
 
 namespace MemberMapper.Core.Implementations
 {
@@ -13,6 +14,7 @@ namespace MemberMapper.Core.Implementations
     private Dictionary<TypePair, ProposedTypeMapping> mappingCache = new Dictionary<TypePair, ProposedTypeMapping>();
 
     private byte[] syncRoot = new byte[0];
+
     private void HandleMappingForMembers(ProposedTypeMapping typeMapping, PropertyOrFieldInfo property, PropertyOrFieldInfo match, MappingOptions options = null)
     {
       if (match != null && match.PropertyOrFieldType.IsAssignableFrom(property.PropertyOrFieldType))
@@ -102,12 +104,29 @@ namespace MemberMapper.Core.Implementations
     }
 
 
-    private ProposedTypeMapping GetTypeMapping(TypePair pair, MappingOptions options = null)
+    private ProposedTypeMapping GetTypeMapping(TypePair pair, MappingOptions options = null, Expression customMapping = null)
     {
       var typeMapping = new ProposedTypeMapping();
 
       typeMapping.SourceMember = null;
       typeMapping.DestinationMember = null;
+
+      if (customMapping != null)
+      {
+        var lambda = customMapping as LambdaExpression;
+
+        if (lambda == null) throw new ArgumentException("Only LambdaExpression is allowed here");
+
+        var memberInit = lambda.Body as MemberInitExpression;
+
+        if (memberInit == null) throw new ArgumentException("Only MemberInitExpression is allowed to specify a custom mapping");
+
+        foreach (var binding in memberInit.Bindings)
+        {
+          
+        }
+
+      }
 
       var destinationProperties = (from p in pair.DestinationType.GetProperties()
                                    where p.CanWrite
@@ -246,7 +265,7 @@ namespace MemberMapper.Core.Implementations
 
 
 
-    public IProposedMap<TSource, TDestination> CreateMap<TSource, TDestination>(MappingOptions options = null)
+    public IProposedMap<TSource, TDestination> CreateMap<TSource, TDestination>(MappingOptions options = null, Expression<Func<TSource, object>> customMapping = null)
     {
       var map = new ProposedMap<TSource, TDestination>();
 
@@ -257,7 +276,7 @@ namespace MemberMapper.Core.Implementations
       map.SourceType = pair.SourceType;
       map.DestinationType = pair.DestinationType;
 
-      var mapping = GetTypeMapping(pair, options);
+      var mapping = GetTypeMapping(pair, options, customMapping);
 
       map.ProposedTypeMapping = mapping;
 

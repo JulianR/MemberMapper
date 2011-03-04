@@ -9,12 +9,12 @@ namespace MemberMapper.ConsoleHost
 
   class Foo
   {
-    public string Z {get;set;}
+    public string Z { get; set; }
   }
 
   class Bar
   {
-    public string Z { get;set;}
+    public string Z { get; set; }
   }
 
   class SourceElement
@@ -51,7 +51,13 @@ namespace MemberMapper.ConsoleHost
     {
       var mapper = new DefaultMemberMapper();
 
-      var map = mapper.CreateMap<SourceType, DestinationType>().FinalizeMap();
+      int i = 2;
+
+      var map = mapper.CreateMap<SourceType, DestinationType>(customMapping: (src) => new
+      {
+        ID = src.Name.Length,
+        Name = src.Name
+      }).FinalizeMap();
 
       //var map = mapper.CreateMap(typeof(SourceType), typeof(DestinationType)).FinalizeMap();
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Reflection;
+using System.Linq.Expressions;
 
 namespace MemberMapper.Core.Interfaces
 {
@@ -20,7 +21,7 @@ namespace MemberMapper.Core.Interfaces
 
     IProposedMap CreateMap(Type source, Type destination, MappingOptions options = null);
 
-    IProposedMap<TSource, TDestination> CreateMap<TSource, TDestination>(MappingOptions options = null);
+    IProposedMap<TSource, TDestination> CreateMap<TSource, TDestination>(MappingOptions options = null, Expression<Func<TSource, object>> customMapping = null);
 
     void RegisterMap(IMemberMap map);
 
