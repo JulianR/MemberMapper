@@ -55,7 +55,7 @@ namespace MemberMapper.ConsoleHost
 
       var map = mapper.CreateMap<SourceType, DestinationType>(customMapping: (src) => new
       {
-        ID = src.Name.Length,
+        ID = src.IDs.Count,
         Name = src.Name
       }).FinalizeMap();
 

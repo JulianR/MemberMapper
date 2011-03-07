@@ -71,5 +71,15 @@ namespace MemberMapper.Core.Implementations
       return member._member;
     }
 
+    public static implicit operator PropertyOrFieldInfo(PropertyInfo member)
+    {
+      return new PropertyOrFieldInfo(member);
+    }
+
+    public static implicit operator PropertyOrFieldInfo(FieldInfo member)
+    {
+      return new PropertyOrFieldInfo(member);
+    }
+
   }
 }

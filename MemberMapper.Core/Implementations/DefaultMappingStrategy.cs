@@ -15,6 +15,9 @@ namespace MemberMapper.Core.Implementations
 
     private byte[] syncRoot = new byte[0];
 
+
+    public IMapGenerator MapGenerator { get; set; }
+
     private void HandleMappingForMembers(ProposedTypeMapping typeMapping, PropertyOrFieldInfo property, PropertyOrFieldInfo match, MappingOptions options = null)
     {
       if (match != null && match.PropertyOrFieldType.IsAssignableFrom(property.PropertyOrFieldType))
@@ -103,6 +106,7 @@ namespace MemberMapper.Core.Implementations
       }
     }
 
+    // ThisMemberment
 
     private ProposedTypeMapping GetTypeMapping(TypePair pair, MappingOptions options = null, Expression customMapping = null)
     {
@@ -111,44 +115,58 @@ namespace MemberMapper.Core.Implementations
       typeMapping.SourceMember = null;
       typeMapping.DestinationMember = null;
 
+      var destinationProperties = (from p in pair.DestinationType.GetProperties()
+                                   where p.CanWrite
+                                   select p);
+
+      HashSet<string> customProperties = new HashSet<string>();
+
       if (customMapping != null)
       {
         var lambda = customMapping as LambdaExpression;
 
         if (lambda == null) throw new ArgumentException("Only LambdaExpression is allowed here");
 
-        var memberInit = lambda.Body as MemberInitExpression;
+        var newType = lambda.Body as NewExpression;
 
-        if (memberInit == null) throw new ArgumentException("Only MemberInitExpression is allowed to specify a custom mapping");
+        if (newType == null) throw new ArgumentException("Only NewExpression is allowed to specify a custom mapping");
 
-        foreach (var binding in memberInit.Bindings)
+        customProperties = new HashSet<string>(newType.Members.Select(m => m.Name));
+
+        foreach (var member in newType.Members)
         {
-          
+          PropertyInfo prop;
+          //if (destinationProperties.TryGetValue(member.Name, out prop))
+          //{
+          //  Console.WriteLine(prop);
+          //}
         }
 
       }
 
-      var destinationProperties = (from p in pair.DestinationType.GetProperties()
-                                   where p.CanWrite
-                                   select p).ToDictionary(k => k.Name);
-
+      
       var sourceProperties = (from p in pair.SourceType.GetProperties()
                               where p.CanRead
-                              select p);
+                              select p).ToDictionary(k => k.Name);
 
-      foreach (var property in sourceProperties)
+      foreach (var property in destinationProperties)
       {
         PropertyInfo match;
 
-        if (destinationProperties.TryGetValue(property.Name, out match)
-          && match.PropertyType.IsAssignableFrom(property.PropertyType))
+        if (customProperties.Contains(property.Name))
+        {
+          continue;
+        }
+
+        if (sourceProperties.TryGetValue(property.Name, out match)
+          && property.PropertyType.IsAssignableFrom(match.PropertyType))
         {
 
           if (options != null)
           {
             var option = new MappingOption();
 
-            options(property, match, option);
+            options(match, property, option);
 
             switch (option.State)
             {
@@ -162,20 +180,20 @@ namespace MemberMapper.Core.Implementations
           (
             new ProposedMemberMapping
             {
-              From = property,
-              To = match
+              From = match,
+              To = property
             }
           );
         }
-        else if (match != null)
+        else if (property != null)
         {
 
-          if (typeof(IEnumerable).IsAssignableFrom(property.PropertyType)
-            && typeof(IEnumerable).IsAssignableFrom(match.PropertyType))
+          if (typeof(IEnumerable).IsAssignableFrom(match.PropertyType)
+            && typeof(IEnumerable).IsAssignableFrom(property.PropertyType))
           {
 
-            var typeOfSourceEnumerable = CollectionTypeHelper.GetTypeInsideEnumerable(property);
-            var typeOfDestinationEnumerable = CollectionTypeHelper.GetTypeInsideEnumerable(match);
+            var typeOfSourceEnumerable = CollectionTypeHelper.GetTypeInsideEnumerable(match);
+            var typeOfDestinationEnumerable = CollectionTypeHelper.GetTypeInsideEnumerable(property);
 
             if (typeOfDestinationEnumerable == typeOfSourceEnumerable)
             {
@@ -184,20 +202,11 @@ namespace MemberMapper.Core.Implementations
                 new ProposedTypeMapping
               {
                 IsEnumerable = true,
-                DestinationMember = match,
-                SourceMember = property,
+                DestinationMember = property,
+                SourceMember = match,
                 ProposedMappings = new List<IProposedMemberMapping>()
               });
 
-              //typeMapping.ProposedMappings.Add
-              //(
-              //  new ProposedMemberMapping
-              //  {
-              //    From = property,
-              //    To = match,
-              //    IsEnumerable = true
-              //  }
-              //);
             }
             else
             {
@@ -213,8 +222,8 @@ namespace MemberMapper.Core.Implementations
               complexTypeMapping = complexTypeMapping.Clone();
 
               complexTypeMapping.IsEnumerable = true;
-              complexTypeMapping.DestinationMember = match;
-              complexTypeMapping.SourceMember = property;
+              complexTypeMapping.DestinationMember = property;
+              complexTypeMapping.SourceMember = match;
 
               typeMapping.ProposedTypeMappings.Add(complexTypeMapping);
             }
@@ -223,7 +232,7 @@ namespace MemberMapper.Core.Implementations
           }
           else
           {
-            var complexPair = new TypePair(property.PropertyType, match.PropertyType);
+            var complexPair = new TypePair(match.PropertyType, property.PropertyType);
 
             ProposedTypeMapping complexTypeMapping;
 
@@ -234,8 +243,8 @@ namespace MemberMapper.Core.Implementations
 
             complexTypeMapping = complexTypeMapping.Clone();
 
-            complexTypeMapping.DestinationMember = match;
-            complexTypeMapping.SourceMember = property;
+            complexTypeMapping.DestinationMember = property;
+            complexTypeMapping.SourceMember = match;
 
             typeMapping.ProposedTypeMappings.Add(complexTypeMapping);
           }
@@ -273,6 +282,10 @@ namespace MemberMapper.Core.Implementations
 
       map.MemberMapCreated += RegisterMap;
 
+      
+      map.MapGenerator = this.MapGenerator;
+
+
       map.SourceType = pair.SourceType;
       map.DestinationType = pair.DestinationType;
 
@@ -287,6 +300,8 @@ namespace MemberMapper.Core.Implementations
     {
 
       var map = new ProposedMap();
+
+      map.MapGenerator = this.MapGenerator;
 
       map.MemberMapCreated += RegisterMap;
 

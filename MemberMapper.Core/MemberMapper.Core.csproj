@@ -51,6 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Implementations\CollectionTypeHelper.cs" />
+    <Compile Include="Implementations\DefaultMapGenerator.cs" />
     <Compile Include="Implementations\MapperOptions.cs" />
     <Compile Include="Implementations\MappingOption.cs" />
     <Compile Include="Implementations\DefaultMappingStrategy.cs" />
@@ -61,6 +62,7 @@
     <Compile Include="Implementations\ProposedMap.cs" />
     <Compile Include="Implementations\ProposedTypeMapping.cs" />
     <Compile Include="Implementations\TypePair.cs" />
+    <Compile Include="Interfaces\IMapGenerator.cs" />
     <Compile Include="Interfaces\IMappingOption.cs" />
     <Compile Include="Interfaces\IMappingStrategy.cs" />
     <Compile Include="Interfaces\IMemberMap.cs" />

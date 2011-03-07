@@ -11,6 +11,12 @@ namespace MemberMapper.Core.Interfaces
     IMemberMap FinalizeMap();
 
     IProposedTypeMapping ProposedTypeMapping { get; }
+
+    Type SourceType { get; }
+    Type DestinationType { get; }
+
+    IMapGenerator MapGenerator { get; set; }
+
   }
 
   public interface IProposedMap<TSource, TDestination> : IProposedMap

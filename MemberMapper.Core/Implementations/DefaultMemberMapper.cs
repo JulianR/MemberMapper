@@ -12,10 +12,11 @@ namespace MemberMapper.Core.Implementations
   {
 
     private readonly MapperOptions options;
-
-    public DefaultMemberMapper(MapperOptions options = null, IMappingStrategy strategy = null)
+    public DefaultMemberMapper(MapperOptions options = null, IMappingStrategy strategy = null, IMapGenerator generator = null)
     {
       this.MappingStrategy = strategy ?? new DefaultMappingStrategy();
+
+      this.MappingStrategy.MapGenerator = generator ?? new DefaultMapGenerator();
 
       this.options = options ?? MapperOptions.Default;
 

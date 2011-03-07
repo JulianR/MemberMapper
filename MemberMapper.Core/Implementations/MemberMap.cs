@@ -50,6 +50,23 @@ namespace MemberMapper.Core.Implementations
 
       return map;
     }
+
+    #region IProposedMap Members
+
+
+    public IMapGenerator MapGenerator
+    {
+      get
+      {
+        throw new NotImplementedException();
+      }
+      set
+      {
+        throw new NotImplementedException();
+      }
+    }
+
+    #endregion
   }
 
   public class MemberMap<TSource, TDestination> : MemberMap, IMemberMap<TSource, TDestination>
