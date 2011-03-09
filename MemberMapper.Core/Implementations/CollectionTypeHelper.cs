@@ -3,11 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Reflection;
+using MemberMapper.Core.Interfaces;
+using System.Collections;
 
 namespace MemberMapper.Core.Implementations
 {
   public static class CollectionTypeHelper
   {
+
+    public static bool IsEnumerable(IProposedTypeMapping mapping)
+    {
+      return typeof(IEnumerable).IsAssignableFrom(mapping.SourceMember.PropertyOrFieldType)
+            && typeof(IEnumerable).IsAssignableFrom(mapping.DestinationMember.PropertyOrFieldType);
+    }
+
     public static Type GetTypeInsideEnumerable(PropertyOrFieldInfo prop)
     {
       var getEnumeratorMethod = prop.PropertyOrFieldType.GetMethod("GetEnumerator", Type.EmptyTypes);

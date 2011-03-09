@@ -9,26 +9,26 @@ namespace MemberMapper.Core.Implementations
 {
   public class ProposedMemberMapping : IProposedMemberMapping
   {
-    public PropertyOrFieldInfo From { get; set; }
-    public PropertyOrFieldInfo To { get; set; }
+    public PropertyOrFieldInfo SourceMember { get; set; }
+    public PropertyOrFieldInfo DestinationMember { get; set; }
 
     public override bool Equals(object obj)
     {
-      if (!(obj is ProposedMemberMapping)) return false;
+      var other = obj as ProposedMemberMapping;
 
-      if (obj == null) return false;
+      if (other == null) return false;
 
       return Equals((ProposedMemberMapping)obj);
     }
 
     public bool Equals(ProposedMemberMapping mapping)
     {
-      return this.To == mapping.To && this.From == mapping.From;
+      return this.DestinationMember == mapping.DestinationMember && this.SourceMember == mapping.SourceMember;
     }
 
     public override int GetHashCode()
     {
-      return this.To.GetHashCode() ^ this.From.GetHashCode();
+      return this.DestinationMember.GetHashCode() ^ this.SourceMember.GetHashCode();
     }
   }
 }

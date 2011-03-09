@@ -14,8 +14,5 @@ namespace MemberMapper.Core.Interfaces
 
     IList<IProposedMemberMapping> ProposedMappings { get; }
     IList<IProposedTypeMapping> ProposedTypeMappings { get; }
-
-    bool IsEnumerable { get; set; }
-
   }
 }

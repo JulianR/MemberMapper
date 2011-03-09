@@ -51,7 +51,7 @@ namespace MemberMapper.Core.Implementations
 
       foreach (var complexTypeMapping in typeMapping.ProposedTypeMappings)
       {
-        if (complexTypeMapping.IsEnumerable)
+        if (CollectionTypeHelper.IsEnumerable(complexTypeMapping))
         {
           BuildCollectionComplexTypeMappingExpressions(source, destination, complexTypeMapping, expressions, newParams);
         }
@@ -64,8 +64,8 @@ namespace MemberMapper.Core.Implementations
 
     private void BuildSimpleTypeMappingExpressions(ParameterExpression source, ParameterExpression destination, IProposedMemberMapping member, List<Expression> expressions, List<ParameterExpression> newParams)
     {
-      var sourceMember = Expression.PropertyOrField(source, member.From.Name);
-      var destMember = Expression.PropertyOrField(destination, member.To.Name);
+      var sourceMember = Expression.PropertyOrField(source, member.SourceMember.Name);
+      var destMember = Expression.PropertyOrField(destination, member.DestinationMember.Name);
 
       var assignSourceToDest = Expression.Assign(destMember, sourceMember);
 
@@ -396,22 +396,22 @@ namespace MemberMapper.Core.Implementations
 
     public Delegate GenerateMappingFunction(IProposedMap proposedMap)
     {
-      var left = Expression.Parameter(proposedMap.DestinationType, "left");
-      var right = Expression.Parameter(proposedMap.SourceType, "right");
+      var destination = Expression.Parameter(proposedMap.DestinationType, "destination");
+      var source = Expression.Parameter(proposedMap.SourceType, "source");
 
       var assignments = new List<Expression>();
 
       var newParams = new List<ParameterExpression>();
 
-      BuildTypeMappingExpressions(right, left, proposedMap.ProposedTypeMapping, assignments, newParams);
+      BuildTypeMappingExpressions(source, destination, proposedMap.ProposedTypeMapping, assignments, newParams);
 
       var block = Expression.Block(assignments);
 
-      var sourceNullCheck = Expression.NotEqual(right, Expression.Constant(null));
+      var sourceNullCheck = Expression.NotEqual(source, Expression.Constant(null));
 
       var ifSourceNotNull = Expression.IfThen(sourceNullCheck, block);
 
-      var outerBlock = Expression.Block(newParams, ifSourceNotNull, left);
+      var outerBlock = Expression.Block(newParams, ifSourceNotNull, destination);
 
       var funcType = typeof(Func<,,>).MakeGenericType(proposedMap.SourceType, proposedMap.DestinationType, proposedMap.DestinationType);
 
@@ -419,7 +419,7 @@ namespace MemberMapper.Core.Implementations
       (
         funcType,
         outerBlock,
-        right, left
+        source, destination
       );
 
       return CompileExpression(proposedMap.SourceType, proposedMap.DestinationType, lambda);

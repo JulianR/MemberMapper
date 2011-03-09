@@ -9,7 +9,7 @@ namespace MemberMapper.Core.Interfaces
 {
   public interface IProposedMemberMapping
   {
-    PropertyOrFieldInfo From { get; set; }
-    PropertyOrFieldInfo To { get; set; }
+    PropertyOrFieldInfo SourceMember { get; set; }
+    PropertyOrFieldInfo DestinationMember { get; set; }
   }
 }

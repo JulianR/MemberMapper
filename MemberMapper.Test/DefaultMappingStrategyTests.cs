@@ -28,31 +28,31 @@ namespace MemberMapper.Test
       public List<int> OtherIDs { get; set; }
     }
 
-    private class ExpectedMappings<T, T1>
+    private class ExpectedMappings<TSource, TDestination>
     {
 
-      public List<ExpectedMapping<T, T1>> Mappings { get; set; }
+      public List<ExpectedMapping<TSource, TDestination>> Mappings { get; set; }
 
       public ExpectedMappings()
       {
-        Mappings = new List<ExpectedMapping<T, T1>>();
+        Mappings = new List<ExpectedMapping<TSource, TDestination>>();
       }
 
-      public void Add(Expression<Func<T, object>> left, Expression<Func<T1, object>> right)
+      public void Add(Expression<Func<TSource, object>> source, Expression<Func<TDestination, object>> destination)
       {
-        Mappings.Add(new ExpectedMapping<T, T1>(left, right));
+        Mappings.Add(new ExpectedMapping<TSource, TDestination>(source, destination));
       }
     }
 
-    private class ExpectedMapping<T, T1>
+    private class ExpectedMapping<TSource, TDestination>
     {
-      public Expression<Func<T, object>> Left { get; set; }
-      public Expression<Func<T1, object>> Right { get; set; }
+      public Expression<Func<TDestination, object>> Destination { get; set; }
+      public Expression<Func<TSource, object>> Source { get; set; }
 
-      public ExpectedMapping(Expression<Func<T, object>> left, Expression<Func<T1, object>> right)
+      public ExpectedMapping(Expression<Func<TSource, object>> source, Expression<Func<TDestination, object>> destination)
       {
-        Left = left;
-        Right = right;
+        Destination = destination;
+        Source = source;
       }
 
     }
@@ -76,9 +76,16 @@ namespace MemberMapper.Test
         if (!map.ProposedTypeMapping.ProposedMappings.Contains(
         new ProposedMemberMapping()
         {
-          From = GetMemberInfoFromExpression(mapping.Left.Body),
-          To = GetMemberInfoFromExpression(mapping.Right.Body)
-        }))
+          SourceMember = GetMemberInfoFromExpression(mapping.Source.Body),
+          DestinationMember = GetMemberInfoFromExpression(mapping.Destination.Body)
+        })
+        && !map.ProposedTypeMapping.ProposedTypeMappings.Contains(
+        new ProposedTypeMapping
+        {
+          SourceMember = GetMemberInfoFromExpression(mapping.Source.Body),
+          DestinationMember = GetMemberInfoFromExpression(mapping.Destination.Body)
+        })
+        )
         {
           return false;
         }
@@ -89,7 +96,7 @@ namespace MemberMapper.Test
 
       }
 
-      if (map.ProposedTypeMapping.ProposedMappings.Count != foundMappings)
+      if (map.ProposedTypeMapping.ProposedMappings.Count + map.ProposedTypeMapping.ProposedTypeMappings.Count != foundMappings)
       {
         return false;
       }
@@ -219,18 +226,11 @@ namespace MemberMapper.Test
 
       var proposition = mapper.CreateMap(typeof(ListSourceType), typeof(ListDestinationType));
 
-      Assert.IsFalse(proposition.ProposedTypeMapping.IsEnumerable);
-    }
+      var expectation = new ExpectedMappings<ListSourceType, ListDestinationType>();
 
-    [TestMethod]
-    public void ListIntPropertyGetsMappedToIEnumerable()
-    {
-      var mapper = new DefaultMemberMapper();
+      expectation.Add(t => t.Source, t => t.Source);
 
-      var proposition = mapper.CreateMap(typeof(IEnumerableSourceType), typeof(ListDestinationType));
-
-      Assert.IsFalse(proposition.ProposedTypeMapping.IsEnumerable);
-
+      Assert.IsTrue(ContainsMappingFor(proposition, expectation));
     }
 
     [TestMethod]
@@ -238,9 +238,13 @@ namespace MemberMapper.Test
     {
       var mapper = new DefaultMemberMapper();
 
-      var proposition = mapper.CreateMap(typeof(IEnumerableSourceType), typeof(ArrayDestinationType));
+      var proposition = mapper.CreateMap(typeof(ListSourceType), typeof(ArrayDestinationType));
 
-      Assert.IsFalse(proposition.ProposedTypeMapping.IsEnumerable);
+      var expectation = new ExpectedMappings<ListSourceType, ArrayDestinationType>();
+
+      expectation.Add(t => t.Source, t => t.Source);
+
+      Assert.IsTrue(ContainsMappingFor(proposition, expectation));
     }
 
     private class SourceElementType
@@ -270,7 +274,11 @@ namespace MemberMapper.Test
 
       var proposition = mapper.CreateMap(typeof(ListComplexSourceType), typeof(ListComplexDestinationType));
 
-      Assert.IsTrue(proposition.ProposedTypeMapping.ProposedTypeMappings.Any(p => p.IsEnumerable));
+      var expectation = new ExpectedMappings<ListComplexSourceType, ListComplexDestinationType>();
+
+      expectation.Add(t => t.Source, t => t.Source);
+
+      Assert.IsTrue(ContainsMappingFor(proposition, expectation));
     }
 
     private class IEnumerableComplexSourceType
@@ -285,7 +293,11 @@ namespace MemberMapper.Test
 
       var proposition = mapper.CreateMap(typeof(IEnumerableComplexSourceType), typeof(ListComplexDestinationType));
 
-      Assert.IsTrue(proposition.ProposedTypeMapping.ProposedTypeMappings.Any(p => p.IsEnumerable));
+      var expectation = new ExpectedMappings<IEnumerableComplexSourceType, ListComplexDestinationType>();
+
+      expectation.Add(t => t.Source, t => t.Source);
+
+      Assert.IsTrue(ContainsMappingFor(proposition, expectation));
     }
 
   }

@@ -41,8 +41,8 @@ namespace MemberMapper.Core.Implementations
         (
           new ProposedMemberMapping
           {
-            From = property,
-            To = match
+            SourceMember = property,
+            DestinationMember = match
           }
         );
       }
@@ -62,7 +62,6 @@ namespace MemberMapper.Core.Implementations
             typeMapping.ProposedTypeMappings.Add(
               new ProposedTypeMapping
               {
-                IsEnumerable = true,
                 DestinationMember = match,
                 SourceMember = property,
                 ProposedMappings = new List<IProposedMemberMapping>()
@@ -78,7 +77,6 @@ namespace MemberMapper.Core.Implementations
             {
               complexTypeMapping = GetTypeMapping(complexPair, options);
             }
-            complexTypeMapping.IsEnumerable = true;
             complexTypeMapping.DestinationMember = match;
             complexTypeMapping.SourceMember = property;
 
@@ -180,8 +178,8 @@ namespace MemberMapper.Core.Implementations
           (
             new ProposedMemberMapping
             {
-              From = match,
-              To = property
+              SourceMember = match,
+              DestinationMember = property
             }
           );
         }
@@ -201,7 +199,6 @@ namespace MemberMapper.Core.Implementations
               typeMapping.ProposedTypeMappings.Add(
                 new ProposedTypeMapping
               {
-                IsEnumerable = true,
                 DestinationMember = property,
                 SourceMember = match,
                 ProposedMappings = new List<IProposedMemberMapping>()
@@ -221,7 +218,6 @@ namespace MemberMapper.Core.Implementations
 
               complexTypeMapping = complexTypeMapping.Clone();
 
-              complexTypeMapping.IsEnumerable = true;
               complexTypeMapping.DestinationMember = property;
               complexTypeMapping.SourceMember = match;
 

@@ -12,8 +12,6 @@ namespace MemberMapper.Core.Implementations
     public PropertyOrFieldInfo SourceMember { get; set; }
     public PropertyOrFieldInfo DestinationMember { get; set; }
 
-    public bool IsEnumerable { get; set; }
-
     public ProposedTypeMapping()
     {
       ProposedMappings = new List<IProposedMemberMapping>();
@@ -31,9 +29,22 @@ namespace MemberMapper.Core.Implementations
         DestinationMember = this.DestinationMember,
         SourceMember = this.SourceMember,
         ProposedMappings = this.ProposedMappings,
-        ProposedTypeMappings = this.ProposedTypeMappings,
-        IsEnumerable = this.IsEnumerable
+        ProposedTypeMappings = this.ProposedTypeMappings
       };
+    }
+
+    public override bool Equals(object obj)
+    {
+      var other = obj as ProposedTypeMapping;
+
+      if (other == null) return false;
+
+      return Equals((ProposedTypeMapping)obj);
+    }
+
+    public bool Equals(ProposedTypeMapping mapping)
+    {
+      return this.DestinationMember == mapping.DestinationMember && this.SourceMember== mapping.SourceMember;
     }
   }
 }
