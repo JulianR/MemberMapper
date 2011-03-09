@@ -60,8 +60,6 @@ namespace MemberMapper.Core.Implementations
           BuildNonCollectionComplexTypeMappingExpressions(source, destination, complexTypeMapping, expressions, newParams);
         }
       }
-
-
     }
 
     private void BuildSimpleTypeMappingExpressions(ParameterExpression source, ParameterExpression destination, IProposedMemberMapping member, List<Expression> expressions, List<ParameterExpression> newParams)

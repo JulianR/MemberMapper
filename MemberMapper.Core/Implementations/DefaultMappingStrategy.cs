@@ -185,7 +185,7 @@ namespace MemberMapper.Core.Implementations
             }
           );
         }
-        else if (property != null)
+        else if (match != null)
         {
 
           if (typeof(IEnumerable).IsAssignableFrom(match.PropertyType)

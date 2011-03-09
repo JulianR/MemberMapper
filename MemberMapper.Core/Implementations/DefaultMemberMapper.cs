@@ -12,6 +12,7 @@ namespace MemberMapper.Core.Implementations
   {
 
     private readonly MapperOptions options;
+
     public DefaultMemberMapper(MapperOptions options = null, IMappingStrategy strategy = null, IMapGenerator generator = null)
     {
       this.MappingStrategy = strategy ?? new DefaultMappingStrategy();
@@ -20,10 +21,7 @@ namespace MemberMapper.Core.Implementations
 
       this.options = options ?? MapperOptions.Default;
 
-      this.MappingStrategy.MemberMapCreated += map =>
-      {
-        this.RegisterMap(map);
-      };
+      this.MappingStrategy.MemberMapCreated += this.RegisterMap;
 
     }
 
@@ -41,7 +39,6 @@ namespace MemberMapper.Core.Implementations
       }
 
       var destination = new TDestination();
-
 
       if (options.BeforeMapping != null) options.BeforeMapping();
 
