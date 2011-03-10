@@ -555,7 +555,7 @@ namespace MemberMapper.Test
     }
 
     [TestMethod]
-    public void EnumerableTypesAreMappedCorrectly()
+    public void ListTypeIsMappedToListTypeCorrectly()
     {
       var mapper = new DefaultMemberMapper();
 
@@ -567,8 +567,103 @@ namespace MemberMapper.Test
         }
       };
 
-      mapper.Map<List<SourceElement>, List<DestElement>>(source);
+      var result = mapper.Map<List<SourceElement>, List<DestElement>>(source);
 
+      Assert.AreEqual("X", result.First().Value);
+
+    }
+
+    [TestMethod]
+    public void IEnumerableTypeIsMappedToListTypeCorrectly()
+    {
+      var mapper = new DefaultMemberMapper();
+
+      var source = new List<SourceElement>
+      {
+        new SourceElement
+        {
+          Value = "X"
+        }
+      };
+
+      var result = mapper.Map<IEnumerable<SourceElement>, List<DestElement>>(source);
+
+      Assert.AreEqual("X", result.First().Value);
+    }
+
+    [TestMethod]
+    public void ArrayTypeIsMappedToListTypeCorrectly()
+    {
+      var mapper = new DefaultMemberMapper();
+
+      var source = new SourceElement[]
+      {
+        new SourceElement
+        {
+          Value = "X"
+        }
+      };
+
+      var result = mapper.Map<SourceElement[], List<DestElement>>(source);
+
+      Assert.AreEqual("X", result.First().Value);
+    }
+
+    [TestMethod]
+    public void ListTypeIsMappedToArrayTypeCorrectly()
+    {
+      var mapper = new DefaultMemberMapper();
+
+      var source = new List<SourceElement>
+      {
+        new SourceElement
+        {
+          Value = "X"
+        }
+      };
+
+      var destination = new DestElement[0];
+
+      var result = mapper.Map<List<SourceElement>, DestElement[]>(source, destination);
+
+      Assert.AreEqual("X", result.First().Value);
+    }
+
+    [TestMethod]
+    public void IEnumerableTypeIsMappedToArrayTypeCorrectly()
+    {
+      var mapper = new DefaultMemberMapper();
+
+      var source = new List<SourceElement>
+      {
+        new SourceElement
+        {
+          Value = "X"
+        }
+      };
+
+      var destination = new DestElement[0];
+
+      var result = mapper.Map<IEnumerable<SourceElement>, DestElement[]>(source, destination);
+
+      Assert.AreEqual("X", result.First().Value);
+    }
+
+    [TestMethod]
+    public void PrimitiveIEnumerableTypeIsMappedToArrayTypeCorrectly()
+    {
+      var mapper = new DefaultMemberMapper();
+
+      var source = new List<int>
+      {
+        1,2,3,4
+      };
+
+      var destination = new int[0];
+
+      var result = mapper.Map<IEnumerable<int>, int[]>(source, destination);
+
+      Assert.IsTrue(result.SequenceEqual(source));
     }
   }
 }

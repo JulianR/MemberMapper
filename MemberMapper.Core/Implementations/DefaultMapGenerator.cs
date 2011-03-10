@@ -425,6 +425,8 @@ namespace MemberMapper.Core.Implementations
 
       var newParams = new List<ParameterExpression>();
 
+      Expression condition;
+
       if (typeof(IEnumerable).IsAssignableFrom(proposedMap.SourceType)
         && typeof(IEnumerable).IsAssignableFrom(proposedMap.DestinationType))
       {
@@ -437,17 +439,20 @@ namespace MemberMapper.Core.Implementations
           },
           IsEnumerable = true,
         };
+        condition = Expression.Constant(true);
+      }
+      else
+      {
+        condition = Expression.NotEqual(source, Expression.Constant(null));
       }
 
       BuildTypeMappingExpressions(source, destination, proposedMap.ProposedTypeMapping, assignments, newParams);
 
       var block = Expression.Block(assignments);
 
-      var sourceNullCheck = Expression.NotEqual(source, Expression.Constant(null));
+      var conditionCheck = Expression.IfThen(condition, block);
 
-      var ifSourceNotNull = Expression.IfThen(sourceNullCheck, block);
-
-      var outerBlock = Expression.Block(newParams, ifSourceNotNull, destination);
+      var outerBlock = Expression.Block(newParams, conditionCheck, destination);
 
       var funcType = typeof(Func<,,>).MakeGenericType(proposedMap.SourceType, proposedMap.DestinationType, proposedMap.DestinationType);
 
