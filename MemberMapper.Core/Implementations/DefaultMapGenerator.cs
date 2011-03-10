@@ -74,13 +74,7 @@ namespace MemberMapper.Core.Implementations
 
     private void BuildCollectionComplexTypeMappingExpressions(ParameterExpression source, ParameterExpression destination, IProposedTypeMapping complexTypeMapping, List<Expression> expressions, List<ParameterExpression> newParams)
     {
-      var ifNotNullBlock = new List<Expression>();
 
-      var destinationCollectionElementType = CollectionTypeHelper.GetTypeInsideEnumerable(complexTypeMapping.DestinationMember.PropertyOrFieldType);
-
-      var sourceCollectionElementType = CollectionTypeHelper.GetTypeInsideEnumerable(complexTypeMapping.SourceMember.PropertyOrFieldType);
-
-      var sourceElementSameAsDestination = destinationCollectionElementType == sourceCollectionElementType;
 
       Type sourceMemberPropertyType, destinationMemberPropertyType;
 
@@ -102,10 +96,19 @@ namespace MemberMapper.Core.Implementations
         destinationMemberPropertyType = destination.Type;
       }
 
+      var ifNotNullBlock = new List<Expression>();
+
+      var destinationCollectionElementType = CollectionTypeHelper.GetTypeInsideEnumerable(destinationMemberPropertyType);
+
+      var sourceCollectionElementType = CollectionTypeHelper.GetTypeInsideEnumerable(sourceMemberPropertyType);
+
+      var sourceElementSameAsDestination = destinationCollectionElementType == sourceCollectionElementType;
+
+
       Type destinationCollectionType;
       ParameterExpression destinationCollection;
 
-      Expression accessSourceCollection = Expression.MakeMemberAccess(source, complexTypeMapping.SourceMember);
+      Expression accessSourceCollection = complexTypeMapping.SourceMember != null ? (Expression)Expression.MakeMemberAccess(source, complexTypeMapping.SourceMember) : source;
 
       Expression accessSourceCollectionSize;
 
@@ -299,7 +302,7 @@ namespace MemberMapper.Core.Implementations
 
       }
 
-      var accessDestinationCollection = Expression.MakeMemberAccess(destination, complexTypeMapping.DestinationMember);
+      Expression accessDestinationCollection = complexTypeMapping.DestinationMember != null ? (Expression) Expression.MakeMemberAccess(destination, complexTypeMapping.DestinationMember) : destination;
 
       var assignDestinationCollection = Expression.Assign(accessDestinationCollection, destinationCollection);
 

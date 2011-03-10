@@ -48,11 +48,21 @@ namespace MemberMapper.Core.Implementations
 
     public static bool operator ==(PropertyOrFieldInfo left, PropertyOrFieldInfo right)
     {
+
+      if (object.ReferenceEquals(left, null) && !object.ReferenceEquals(right, null)) return false;
+
+      if (object.ReferenceEquals(left, null) && object.ReferenceEquals(right, null)) return true;
+
       return left.Equals(right);
     }
 
     public static bool operator !=(PropertyOrFieldInfo left, PropertyOrFieldInfo right)
     {
+
+      if (object.ReferenceEquals(left, null) && !object.ReferenceEquals(right, null)) return true;
+
+      if (object.ReferenceEquals(left, null) && object.ReferenceEquals(right, null)) return false;
+
       return !left.Equals(right);
     }
 
