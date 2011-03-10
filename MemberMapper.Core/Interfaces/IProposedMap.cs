@@ -10,7 +10,7 @@ namespace MemberMapper.Core.Interfaces
   {
     IMemberMap FinalizeMap();
 
-    IProposedTypeMapping ProposedTypeMapping { get; }
+    IProposedTypeMapping ProposedTypeMapping { get; set; }
 
     Type SourceType { get; }
     Type DestinationType { get; }

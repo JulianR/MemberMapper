@@ -17,13 +17,13 @@ namespace MemberMapper.Core.Implementations
             && typeof(IEnumerable).IsAssignableFrom(mapping.DestinationMember.PropertyOrFieldType);
     }
 
-    public static Type GetTypeInsideEnumerable(PropertyOrFieldInfo prop)
+    public static Type GetTypeInsideEnumerable(Type type)
     {
-      var getEnumeratorMethod = prop.PropertyOrFieldType.GetMethod("GetEnumerator", Type.EmptyTypes);
+      var getEnumeratorMethod = type.GetMethod("GetEnumerator", Type.EmptyTypes);
 
       if (getEnumeratorMethod == null)
       {
-        getEnumeratorMethod = (from i in prop.PropertyOrFieldType.GetInterfaces()
+        getEnumeratorMethod = (from i in type.GetInterfaces()
                                from m in i.GetMethods()
                                where m.Name == "GetEnumerator"
                                orderby m.ReturnType.IsGenericType descending
@@ -37,9 +37,9 @@ namespace MemberMapper.Core.Implementations
       {
         return getEnumeratorMethod.ReturnType.GetGenericArguments().First();
       }
-      else if (prop.PropertyOrFieldType.IsArray)
+      else if (type.IsArray)
       {
-        return prop.PropertyOrFieldType.GetElementType();
+        return type.GetElementType();
       }
 
       return typeof(object);

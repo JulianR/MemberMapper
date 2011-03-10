@@ -18,6 +18,8 @@ namespace MemberMapper.Core.Implementations
       ProposedTypeMappings = new List<IProposedTypeMapping>();
     }
 
+    public bool IsEnumerable { get; set; }
+
     public IList<IProposedTypeMapping> ProposedTypeMappings { get; set; }
 
     public IList<IProposedMemberMapping> ProposedMappings { get; set; }

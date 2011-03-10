@@ -12,6 +12,8 @@ namespace MemberMapper.Core.Interfaces
     PropertyOrFieldInfo SourceMember { get; set; }
     PropertyOrFieldInfo DestinationMember { get; set; }
 
+    bool IsEnumerable { get; set; }
+
     IList<IProposedMemberMapping> ProposedMappings { get; }
     IList<IProposedTypeMapping> ProposedTypeMappings { get; }
   }

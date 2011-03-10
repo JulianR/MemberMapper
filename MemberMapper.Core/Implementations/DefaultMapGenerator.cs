@@ -51,7 +51,7 @@ namespace MemberMapper.Core.Implementations
 
       foreach (var complexTypeMapping in typeMapping.ProposedTypeMappings)
       {
-        if (CollectionTypeHelper.IsEnumerable(complexTypeMapping))
+        if (typeMapping.IsEnumerable || CollectionTypeHelper.IsEnumerable(complexTypeMapping))
         {
           BuildCollectionComplexTypeMappingExpressions(source, destination, complexTypeMapping, expressions, newParams);
         }
@@ -74,23 +74,42 @@ namespace MemberMapper.Core.Implementations
 
     private void BuildCollectionComplexTypeMappingExpressions(ParameterExpression source, ParameterExpression destination, IProposedTypeMapping complexTypeMapping, List<Expression> expressions, List<ParameterExpression> newParams)
     {
-
       var ifNotNullBlock = new List<Expression>();
 
-      var destinationCollectionElementType = CollectionTypeHelper.GetTypeInsideEnumerable(complexTypeMapping.DestinationMember);
+      var destinationCollectionElementType = CollectionTypeHelper.GetTypeInsideEnumerable(complexTypeMapping.DestinationMember.PropertyOrFieldType);
 
-      var sourceCollectionElementType = CollectionTypeHelper.GetTypeInsideEnumerable(complexTypeMapping.SourceMember);
+      var sourceCollectionElementType = CollectionTypeHelper.GetTypeInsideEnumerable(complexTypeMapping.SourceMember.PropertyOrFieldType);
 
       var sourceElementSameAsDestination = destinationCollectionElementType == sourceCollectionElementType;
+
+      Type sourceMemberPropertyType, destinationMemberPropertyType;
+
+      if (complexTypeMapping.SourceMember != null)
+      {
+        sourceMemberPropertyType = complexTypeMapping.SourceMember.PropertyOrFieldType;
+      }
+      else
+      {
+        sourceMemberPropertyType = source.Type;
+      }
+
+      if (complexTypeMapping.DestinationMember != null)
+      {
+        destinationMemberPropertyType = complexTypeMapping.DestinationMember.PropertyOrFieldType;
+      }
+      else
+      {
+        destinationMemberPropertyType = destination.Type;
+      }
 
       Type destinationCollectionType;
       ParameterExpression destinationCollection;
 
-      var accessSourceCollection = Expression.MakeMemberAccess(source, complexTypeMapping.SourceMember);
+      Expression accessSourceCollection = Expression.MakeMemberAccess(source, complexTypeMapping.SourceMember);
 
       Expression accessSourceCollectionSize;
 
-      if (complexTypeMapping.SourceMember.PropertyOrFieldType.IsArray)
+      if (sourceMemberPropertyType.IsArray)
       {
         accessSourceCollectionSize = Expression.Property(accessSourceCollection, "Length");
       }
@@ -99,7 +118,7 @@ namespace MemberMapper.Core.Implementations
 
         var genericCollection = typeof(ICollection<>).MakeGenericType(sourceCollectionElementType);
 
-        if (genericCollection.IsAssignableFrom(complexTypeMapping.SourceMember.PropertyOrFieldType))
+        if (genericCollection.IsAssignableFrom(sourceMemberPropertyType))
         {
           var countProperty = genericCollection.GetProperty("Count");
 
@@ -119,9 +138,9 @@ namespace MemberMapper.Core.Implementations
         }
       }
 
-      if (complexTypeMapping.DestinationMember.PropertyOrFieldType.IsArray)
+      if (destinationMemberPropertyType.IsArray)
       {
-        destinationCollectionType = complexTypeMapping.DestinationMember.PropertyOrFieldType;
+        destinationCollectionType = destinationMemberPropertyType;
 
         destinationCollection = Expression.Parameter(destinationCollectionType, GetCollectionName());
 
@@ -193,8 +212,8 @@ namespace MemberMapper.Core.Implementations
 
       }
 
-      if (typeof(IList).IsAssignableFrom(complexTypeMapping.SourceMember.PropertyOrFieldType)
-        || (complexTypeMapping.SourceMember.PropertyOrFieldType.IsGenericType && typeof(IList<>).IsAssignableFrom(complexTypeMapping.SourceMember.PropertyOrFieldType.GetGenericTypeDefinition())))
+      if (typeof(IList).IsAssignableFrom(sourceMemberPropertyType)
+        || (sourceMemberPropertyType.IsGenericType && typeof(IList<>).IsAssignableFrom(sourceMemberPropertyType.GetGenericTypeDefinition())))
       {
 
 
@@ -206,7 +225,7 @@ namespace MemberMapper.Core.Implementations
 
         var terminationCondition = Expression.LessThan(iteratorVar, accessSourceCollectionSize);
 
-        var indexer = complexTypeMapping.SourceMember.PropertyOrFieldType.GetProperties().FirstOrDefault(p => p.GetIndexParameters().Length == 1);
+        var indexer = sourceMemberPropertyType.GetProperties().FirstOrDefault(p => p.GetIndexParameters().Length == 1);
 
         var accessSourceCollectionByIndex = Expression.MakeIndex(accessSourceCollection, indexer, new[] { iteratorVar });
 
@@ -235,13 +254,13 @@ namespace MemberMapper.Core.Implementations
       else
       {
 
-        var getEnumeratorOnSourceMethod = complexTypeMapping.SourceMember.PropertyOrFieldType.GetMethod("GetEnumerator", Type.EmptyTypes);
+        var getEnumeratorOnSourceMethod = sourceMemberPropertyType.GetMethod("GetEnumerator", Type.EmptyTypes);
 
         var sourceEnumeratorType = getEnumeratorOnSourceMethod.ReturnType;
 
         var sourceEnumerator = Expression.Parameter(sourceEnumeratorType, GetEnumeratorName());
 
-        if (complexTypeMapping.DestinationMember.PropertyOrFieldType.IsArray)
+        if (destinationMemberPropertyType.IsArray)
         {
           newParams.Add(iteratorVar);
         }
@@ -263,7 +282,7 @@ namespace MemberMapper.Core.Implementations
 
         expressionsInsideLoop.Add(assignItemToDestination);
 
-        if (complexTypeMapping.DestinationMember.PropertyOrFieldType.IsArray)
+        if (destinationMemberPropertyType.IsArray)
         {
           expressionsInsideLoop.Add(increment);
         }
@@ -402,6 +421,20 @@ namespace MemberMapper.Core.Implementations
       var assignments = new List<Expression>();
 
       var newParams = new List<ParameterExpression>();
+
+      if (typeof(IEnumerable).IsAssignableFrom(proposedMap.SourceType)
+        && typeof(IEnumerable).IsAssignableFrom(proposedMap.DestinationType))
+      {
+
+        proposedMap.ProposedTypeMapping = new ProposedTypeMapping
+        {
+          ProposedTypeMappings = new List<IProposedTypeMapping>
+          {
+            proposedMap.ProposedTypeMapping,
+          },
+          IsEnumerable = true,
+        };
+      }
 
       BuildTypeMappingExpressions(source, destination, proposedMap.ProposedTypeMapping, assignments, newParams);
 

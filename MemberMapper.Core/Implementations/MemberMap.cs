@@ -16,6 +16,7 @@ namespace MemberMapper.Core.Implementations
     public IProposedTypeMapping ProposedTypeMapping
     {
       get { throw new NotImplementedException(); }
+      set { }
     }
 
     #region IMemberMap Members

@@ -553,5 +553,22 @@ namespace MemberMapper.Test
       Assert.AreEqual(source.List.Count(), result.List.Count());
       Assert.AreEqual("X", result.List.Single());
     }
+
+    [TestMethod]
+    public void EnumerableTypesAreMappedCorrectly()
+    {
+      var mapper = new DefaultMemberMapper();
+
+      var source = new List<SourceElement>
+      {
+        new SourceElement
+        {
+          Value = "X"
+        }
+      };
+
+      mapper.Map<List<SourceElement>, List<DestElement>>(source);
+
+    }
   }
 }
