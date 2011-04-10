@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Linq.Expressions;
 using ThisMember.Core;
-using ThisMember.Interfaces;
+using ThisMember.Core.Interfaces;
 
 namespace ThisMember.ConsoleHost
 {

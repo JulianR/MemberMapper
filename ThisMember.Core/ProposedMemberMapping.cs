@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using ThisMember.Interfaces;
+using ThisMember.Core.Interfaces;
 using System.Reflection;
 
 namespace ThisMember.Core
 {
-  public class ProposedMemberMapping : IProposedMemberMapping
+  public class ProposedMemberMapping
   {
     public PropertyOrFieldInfo SourceMember { get; set; }
     public PropertyOrFieldInfo DestinationMember { get; set; }

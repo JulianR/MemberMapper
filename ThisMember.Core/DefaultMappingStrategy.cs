@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using ThisMember.Interfaces;
+using ThisMember.Core.Interfaces;
 using System.Reflection;
 using System.Collections;
 using System.Linq.Expressions;
@@ -141,7 +141,7 @@ namespace ThisMember.Core
               {
                 DestinationMember = destinationProperty,
                 SourceMember = sourceProperty,
-                ProposedMappings = new List<IProposedMemberMapping>()
+                ProposedMappings = new List<ProposedMemberMapping>()
               });
 
             }
@@ -163,8 +163,6 @@ namespace ThisMember.Core
 
               typeMapping.ProposedTypeMappings.Add(complexTypeMapping);
             }
-
-
           }
           else
           {
@@ -195,7 +193,7 @@ namespace ThisMember.Core
       return typeMapping;
     }
 
-    public IProposedMap<TSource, TDestination> CreateMap<TSource, TDestination>(MappingOptions options = null, Expression<Func<TSource, object>> customMapping = null)
+    public ProposedMap<TSource, TDestination> CreateMap<TSource, TDestination>(MappingOptions options = null, Expression<Func<TSource, object>> customMapping = null)
     {
       var map = new ProposedMap<TSource, TDestination>(this.mapper);
 
@@ -214,7 +212,7 @@ namespace ThisMember.Core
       return map;
     }
 
-    public IProposedMap CreateMap(TypePair pair, MappingOptions options = null)
+    public ProposedMap CreateMap(TypePair pair, MappingOptions options = null)
     {
 
       var map = new ProposedMap(this.mapper);

@@ -16,8 +16,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThisMember.Core", "ThisMemb
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThisMember.Test", "ThisMember.Test\ThisMember.Test.csproj", "{A6339EA6-BCA9-4E0A-873B-EE73E973F230}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThisMember.Interfaces", "ThisMember.Interfaces\ThisMember.Interfaces.csproj", "{3A73BC86-8A28-44B5-A348-2DC8B94F651F}"
-EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = ThisMember1.vsmdi
@@ -71,16 +69,6 @@ Global
 		{A6339EA6-BCA9-4E0A-873B-EE73E973F230}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{A6339EA6-BCA9-4E0A-873B-EE73E973F230}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{A6339EA6-BCA9-4E0A-873B-EE73E973F230}.Release|x86.ActiveCfg = Release|Any CPU
-		{3A73BC86-8A28-44B5-A348-2DC8B94F651F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3A73BC86-8A28-44B5-A348-2DC8B94F651F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3A73BC86-8A28-44B5-A348-2DC8B94F651F}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{3A73BC86-8A28-44B5-A348-2DC8B94F651F}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{3A73BC86-8A28-44B5-A348-2DC8B94F651F}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{3A73BC86-8A28-44B5-A348-2DC8B94F651F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3A73BC86-8A28-44B5-A348-2DC8B94F651F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3A73BC86-8A28-44B5-A348-2DC8B94F651F}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{3A73BC86-8A28-44B5-A348-2DC8B94F651F}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{3A73BC86-8A28-44B5-A348-2DC8B94F651F}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

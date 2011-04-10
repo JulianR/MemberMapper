@@ -5,7 +5,7 @@ using System.Text;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace ThisMember.Interfaces
+namespace ThisMember.Core.Interfaces
 {
 
   public class MemberExpressionTuple

@@ -52,10 +52,6 @@
       <Project>{FDFD194D-D672-41C2-9707-55BB77C63AFA}</Project>
       <Name>ThisMember.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ThisMember.Interfaces\ThisMember.Interfaces.csproj">
-      <Project>{3A73BC86-8A28-44B5-A348-2DC8B94F651F}</Project>
-      <Name>ThisMember.Interfaces</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using ThisMember.Interfaces;
+using ThisMember.Core.Interfaces;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Collections;
@@ -10,9 +10,8 @@ using System.Reflection.Emit;
 
 namespace ThisMember.Core
 {
-  public class ProposedMap : IProposedMap
+  public class ProposedMap
   {
-
     public Type SourceType { get; set; }
     public Type DestinationType { get; set; }
 
@@ -27,7 +26,7 @@ namespace ThisMember.Core
       this.mapper = mapper;
     }
 
-    public IMemberMap FinalizeMap()
+    public MemberMap FinalizeMap()
     {
       var map = new MemberMap();
 
@@ -40,11 +39,11 @@ namespace ThisMember.Core
       return map;
     }
 
-    public IProposedTypeMapping ProposedTypeMapping { get; set; }
+    public ProposedTypeMapping ProposedTypeMapping { get; set; }
 
   }
 
-  public class ProposedMap<TSource, TDestination> : ProposedMap, IProposedMap<TSource, TDestination>
+  public class ProposedMap<TSource, TDestination> : ProposedMap
   {
 
     public ProposedMap(IMemberMapper mapper)
@@ -52,7 +51,7 @@ namespace ThisMember.Core
     {
     }
 
-    public IProposedMap<TSource, TDestination> AddExpression<TSourceReturn, TDestinationReturn>(Expression<Func<TSource, TSourceReturn>> source, Expression<Func<TDestination, TDestinationReturn>> destination) where TDestinationReturn : TSourceReturn
+    public ProposedMap<TSource, TDestination> AddExpression<TSourceReturn, TDestinationReturn>(Expression<Func<TSource, TSourceReturn>> source, Expression<Func<TDestination, TDestinationReturn>> destination) where TDestinationReturn : TSourceReturn
     {
       throw new NotImplementedException();
     }

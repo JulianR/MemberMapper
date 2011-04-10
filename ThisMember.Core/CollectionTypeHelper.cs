@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Reflection;
-using ThisMember.Interfaces;
+using ThisMember.Core.Interfaces;
 using System.Collections;
 
 namespace ThisMember.Core
@@ -11,7 +11,7 @@ namespace ThisMember.Core
   public static class CollectionTypeHelper
   {
 
-    public static bool IsEnumerable(IProposedTypeMapping mapping)
+    public static bool IsEnumerable(ProposedTypeMapping mapping)
     {
       return typeof(IEnumerable).IsAssignableFrom(mapping.SourceMember.PropertyOrFieldType)
             && typeof(IEnumerable).IsAssignableFrom(mapping.DestinationMember.PropertyOrFieldType);

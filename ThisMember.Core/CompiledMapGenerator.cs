@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using ThisMember.Interfaces;
+using ThisMember.Core.Interfaces;
 using System.Reflection;
 using System.Linq.Expressions;
 using System.Reflection.Emit;
@@ -61,7 +61,7 @@ namespace ThisMember.Core
       return "i#" + currentID++;
     }
 
-    private void BuildTypeMappingExpressions(ParameterExpression source, ParameterExpression destination, IProposedTypeMapping typeMapping, List<Expression> expressions, List<ParameterExpression> newParams, CustomMapping customMapping = null)
+    private void BuildTypeMappingExpressions(ParameterExpression source, ParameterExpression destination, ProposedTypeMapping typeMapping, List<Expression> expressions, List<ParameterExpression> newParams, CustomMapping customMapping = null)
     {
 
       foreach (var member in typeMapping.ProposedMappings)
@@ -82,7 +82,7 @@ namespace ThisMember.Core
       }
     }
 
-    private void BuildSimpleTypeMappingExpressions(ParameterExpression source, ParameterExpression destination, IProposedMemberMapping member, List<Expression> expressions, List<ParameterExpression> newParams, CustomMapping customMapping = null)
+    private void BuildSimpleTypeMappingExpressions(ParameterExpression source, ParameterExpression destination, ProposedMemberMapping member, List<Expression> expressions, List<ParameterExpression> newParams, CustomMapping customMapping = null)
     {
       Expression sourceExpression = Expression.PropertyOrField(source, member.SourceMember.Name);
       var destMember = Expression.PropertyOrField(destination, member.DestinationMember.Name);
@@ -108,7 +108,7 @@ namespace ThisMember.Core
       expressions.Add(assignSourceToDest);
     }
 
-    private void BuildCollectionComplexTypeMappingExpressions(ParameterExpression source, ParameterExpression destination, IProposedTypeMapping complexTypeMapping, List<Expression> expressions, List<ParameterExpression> newParams)
+    private void BuildCollectionComplexTypeMappingExpressions(ParameterExpression source, ParameterExpression destination, ProposedTypeMapping complexTypeMapping, List<Expression> expressions, List<ParameterExpression> newParams)
     {
 
 
@@ -350,7 +350,7 @@ namespace ThisMember.Core
 
     }
 
-    private void BuildNonCollectionComplexTypeMappingExpressions(ParameterExpression source, ParameterExpression destination, IProposedTypeMapping complexTypeMapping, List<Expression> expressions, List<ParameterExpression> newParams)
+    private void BuildNonCollectionComplexTypeMappingExpressions(ParameterExpression source, ParameterExpression destination, ProposedTypeMapping complexTypeMapping, List<Expression> expressions, List<ParameterExpression> newParams)
     {
 
       ParameterExpression complexSource = null, complexDest = null;
@@ -452,7 +452,7 @@ namespace ThisMember.Core
 
     }
 
-    public Delegate GenerateMappingFunction(IProposedMap proposedMap)
+    public Delegate GenerateMappingFunction(ProposedMap proposedMap)
     {
       var destination = Expression.Parameter(proposedMap.DestinationType, "destination");
       var source = Expression.Parameter(proposedMap.SourceType, "source");
@@ -469,7 +469,7 @@ namespace ThisMember.Core
 
         proposedMap.ProposedTypeMapping = new ProposedTypeMapping
         {
-          ProposedTypeMappings = new List<IProposedTypeMapping>
+          ProposedTypeMappings = new List<ProposedTypeMapping>
           {
             proposedMap.ProposedTypeMapping,
           },

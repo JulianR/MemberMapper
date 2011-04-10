@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using ThisMember.Interfaces;
+using ThisMember.Core.Interfaces;
 
 namespace ThisMember.Core
 {
@@ -13,7 +13,7 @@ namespace ThisMember.Core
     Ignored
   }
 
-  public class MappingOption : IMappingOption
+  public class MappingOption
   {
 
     public MappingOptionState State { get; private set; }

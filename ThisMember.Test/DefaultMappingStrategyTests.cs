@@ -5,7 +5,7 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ThisMember.Core;
 using System.Linq.Expressions;
-using ThisMember.Interfaces;
+using ThisMember.Core.Interfaces;
 using System.Reflection;
 
 namespace ThisMember.Test
@@ -67,7 +67,7 @@ namespace ThisMember.Test
       return expression2.Member;
     }
 
-    static bool ContainsMappingFor<T, T2>(IProposedMap map, ExpectedMappings<T, T2> mappings)
+    static bool ContainsMappingFor<T, T2>(ProposedMap map, ExpectedMappings<T, T2> mappings)
     {
       int foundMappings = 0;
       foreach (var mapping in mappings.Mappings)

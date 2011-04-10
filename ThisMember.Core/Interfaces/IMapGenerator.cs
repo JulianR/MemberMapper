@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace ThisMember.Interfaces
+namespace ThisMember.Core.Interfaces
 {
   public interface IMapGenerator
   {
-    Delegate GenerateMappingFunction(IProposedMap map);
+    Delegate GenerateMappingFunction(ProposedMap map);
   }
 }

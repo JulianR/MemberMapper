@@ -2,24 +2,22 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using ThisMember.Interfaces;
+using ThisMember.Core.Interfaces;
 
 namespace ThisMember.Core
 {
-  public class MemberMap : IMemberMap
+  public class MemberMap
   {
-    public IMemberMap FinalizeMap()
+    public MemberMap FinalizeMap()
     {
       return this;
     }
 
-    public IProposedTypeMapping ProposedTypeMapping
+    public ProposedTypeMapping ProposedTypeMapping
     {
       get { throw new NotImplementedException(); }
       set { }
     }
-
-    #region IMemberMap Members
 
     public Type SourceType
     {
@@ -39,9 +37,7 @@ namespace ThisMember.Core
       set;
     }
 
-    #endregion
-
-    public IMemberMap<TSource, TDestination> ToGeneric<TSource, TDestination>()
+    public MemberMap<TSource, TDestination> ToGeneric<TSource, TDestination>()
     {
       var map = new MemberMap<TSource, TDestination>();
 
@@ -79,15 +75,13 @@ namespace ThisMember.Core
 
   }
 
-  public class MemberMap<TSource, TDestination> : MemberMap, IMemberMap<TSource, TDestination>
+  public class MemberMap<TSource, TDestination> : MemberMap
   {
 
-    public IProposedMap<TSource, TDestination> AddExpression<TSourceReturn, TDestinationReturn>(System.Linq.Expressions.Expression<Func<TSource, TSourceReturn>> source, System.Linq.Expressions.Expression<Func<TDestination, TDestinationReturn>> destination) where TDestinationReturn : TSourceReturn
+    public ProposedMap<TSource, TDestination> AddExpression<TSourceReturn, TDestinationReturn>(System.Linq.Expressions.Expression<Func<TSource, TSourceReturn>> source, System.Linq.Expressions.Expression<Func<TDestination, TDestinationReturn>> destination) where TDestinationReturn : TSourceReturn
     {
       throw new NotImplementedException();
     }
-
-    #region IMemberMap<TSource,TDestination> Members
 
     public new Func<TSource, TDestination, TDestination> MappingFunction
     {
@@ -95,6 +89,5 @@ namespace ThisMember.Core
       set;
     }
 
-    #endregion
   }
 }

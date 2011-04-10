@@ -2,27 +2,27 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using ThisMember.Interfaces;
+using ThisMember.Core.Interfaces;
 using System.Reflection;
 
 namespace ThisMember.Core
 {
-  public class ProposedTypeMapping : IProposedTypeMapping
+  public class ProposedTypeMapping
   {
     public PropertyOrFieldInfo SourceMember { get; set; }
     public PropertyOrFieldInfo DestinationMember { get; set; }
 
     public ProposedTypeMapping()
     {
-      ProposedMappings = new List<IProposedMemberMapping>();
-      ProposedTypeMappings = new List<IProposedTypeMapping>();
+      ProposedMappings = new List<ProposedMemberMapping>();
+      ProposedTypeMappings = new List<ProposedTypeMapping>();
     }
 
     public bool IsEnumerable { get; set; }
 
-    public IList<IProposedTypeMapping> ProposedTypeMappings { get; set; }
+    public IList<ProposedTypeMapping> ProposedTypeMappings { get; set; }
 
-    public IList<IProposedMemberMapping> ProposedMappings { get; set; }
+    public IList<ProposedMemberMapping> ProposedMappings { get; set; }
 
     public ProposedTypeMapping Clone()
     {
