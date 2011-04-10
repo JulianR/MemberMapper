@@ -16,10 +16,6 @@ namespace ThisMember.Interfaces
 
     IProposedMap<TSource, TDestination> CreateMap<TSource, TDestination>(MappingOptions options = null, Expression<Func<TSource, object>> customMapping = null);
 
-    IMemberMap CreateAndFinalizeMap(TypePair pair, MappingOptions options = null);
-
-    event Action<IMemberMap> MemberMapCreated;
-
     IMapGenerator MapGenerator { get; set; }
   }
 }

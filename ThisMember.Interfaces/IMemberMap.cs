@@ -18,5 +18,6 @@ namespace ThisMember.Interfaces
 
   public interface IMemberMap<TSource, TDestination> : IProposedMap<TSource, TDestination>
   {
+    Func<TSource, TDestination, TDestination> MappingFunction { get; set; }
   }
 }

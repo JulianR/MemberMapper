@@ -77,7 +77,9 @@ namespace ThisMember.ConsoleHost
 
       var map = mapper.CreateMap<SourceType, DestinationType>(customMapping: (src) => new
       {
-        ID = src.IDs.Count + 100 + i,
+        //ID = src.IDs.Count + 100 + i,
+        ID = (from x in Enumerable.Range(0,100)
+              select x).Sum(),
         Name = src.Name.Length.ToString() + " " + src.Name
       }).FinalizeMap();
 

@@ -20,12 +20,12 @@ namespace ThisMember.Core
 
     public IMapGenerator MapGenerator { get; set; }
 
-    public ProposedMap()
+    private readonly IMemberMapper mapper;
+
+    public ProposedMap(IMemberMapper mapper)
     {
+      this.mapper = mapper;
     }
-
-    public event Action<ProposedMap, IMemberMap> MemberMapCreated;
-
 
     public IMemberMap FinalizeMap()
     {
@@ -35,10 +35,7 @@ namespace ThisMember.Core
       map.DestinationType = this.DestinationType;
       map.MappingFunction = this.MapGenerator.GenerateMappingFunction(this);
 
-      if (MemberMapCreated != null)
-      {
-        MemberMapCreated(this, map);
-      }
+      mapper.RegisterMap(map);
 
       return map;
     }
@@ -49,6 +46,12 @@ namespace ThisMember.Core
 
   public class ProposedMap<TSource, TDestination> : ProposedMap, IProposedMap<TSource, TDestination>
   {
+
+    public ProposedMap(IMemberMapper mapper)
+      : base(mapper)
+    {
+    }
+
     public IProposedMap<TSource, TDestination> AddExpression<TSourceReturn, TDestinationReturn>(Expression<Func<TSource, TSourceReturn>> source, Expression<Func<TDestination, TDestinationReturn>> destination) where TDestinationReturn : TSourceReturn
     {
       throw new NotImplementedException();

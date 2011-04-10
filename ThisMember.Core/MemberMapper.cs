@@ -15,14 +15,11 @@ namespace ThisMember.Core
 
     public MemberMapper(MapperOptions options = null, IMappingStrategy strategy = null, IMapGenerator generator = null)
     {
-      this.MappingStrategy = strategy ?? new DefaultMappingStrategy();
+      this.MappingStrategy = strategy ?? new DefaultMappingStrategy(this);
 
       this.MappingStrategy.MapGenerator = generator ?? new CompiledMapGenerator();
 
       this.options = options ?? MapperOptions.Default;
-
-      this.MappingStrategy.MemberMapCreated += this.RegisterMap;
-
     }
 
     private Dictionary<TypePair, IMemberMap> maps = new Dictionary<TypePair, IMemberMap>();
@@ -35,7 +32,7 @@ namespace ThisMember.Core
 
       if (!this.maps.TryGetValue(pair, out map))
       {
-        map = MappingStrategy.CreateAndFinalizeMap(pair);
+        map = MappingStrategy.CreateMap(pair).FinalizeMap();
       }
 
       var destination = new TDestination();
@@ -63,34 +60,19 @@ namespace ThisMember.Core
 
     public IProposedMap<TSource, TDestination> CreateMap<TSource, TDestination>(MappingOptions options = null, Expression<Func<TSource, object>> customMapping = null)
     {
-      IMemberMap map;
+      var proposedMap = this.MappingStrategy.CreateMap<TSource, TDestination>(options, customMapping);
 
-      var pair = new TypePair(typeof(TSource), typeof(TDestination));
-
-      if (!this.maps.TryGetValue(pair, out map))
-      {
-        var proposedMap = this.MappingStrategy.CreateMap<TSource, TDestination>(options,customMapping);
-
-        return proposedMap;
-      }
-
-      return map.ToGeneric<TSource, TDestination>();
+      return proposedMap;
     }
 
     public IProposedMap CreateMap(Type source, Type destination, MappingOptions options = null)
     {
-      IMemberMap map;
 
       var pair = new TypePair(source, destination);
 
-      if (!this.maps.TryGetValue(pair, out map))
-      {
-        var proposedMap = this.MappingStrategy.CreateMap(pair, options);
+      var proposedMap = this.MappingStrategy.CreateMap(pair, options);
 
-        return proposedMap;
-      }
-
-      return map;
+      return proposedMap;
 
     }
 
@@ -102,7 +84,7 @@ namespace ThisMember.Core
 
       if (!this.maps.TryGetValue(pair, out map))
       {
-        map = MappingStrategy.CreateAndFinalizeMap(pair);
+        map = MappingStrategy.CreateMap(pair).FinalizeMap();
       }
       if (options.BeforeMapping != null) options.BeforeMapping();
 
@@ -117,7 +99,7 @@ namespace ThisMember.Core
 
     public void RegisterMap(IMemberMap map)
     {
-      this.maps.Add(new TypePair(map.SourceType, map.DestinationType), map);
+      this.maps[new TypePair(map.SourceType, map.DestinationType)] = map;
     }
 
     public TSource Map<TSource>(TSource source) where TSource : new()
@@ -130,6 +112,15 @@ namespace ThisMember.Core
 
     public IMappingStrategy MappingStrategy { get; set; }
 
+    public IMemberMap CreateAndFinalizeMap(Type source, Type destination, MappingOptions options = null)
+    {
+      return CreateMap(source, destination, options).FinalizeMap();
+    }
+
+    public IMemberMap<TSource, TDestination> CreateAndFinalizeMap<TSource, TDestination>(MappingOptions options = null, Expression<Func<TSource, object>> customMapping = null)
+    {
+      return CreateMap<TSource, TDestination>(options, customMapping).FinalizeMap().ToGeneric<TSource, TDestination>();
+    }
 
   }
 }

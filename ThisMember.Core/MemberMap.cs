@@ -47,13 +47,10 @@ namespace ThisMember.Core
 
       map.DestinationType = this.DestinationType;
       map.SourceType = this.SourceType;
-      map.MappingFunction = this.MappingFunction;
+      map.MappingFunction = (Func<TSource, TDestination, TDestination>) this.MappingFunction;
 
       return map;
     }
-
-    #region IProposedMap Members
-
 
     public IMapGenerator MapGenerator
     {
@@ -66,10 +63,6 @@ namespace ThisMember.Core
         throw new NotImplementedException();
       }
     }
-
-    #endregion
-
-    #region IProposedMap Members
 
 
     public CustomMapping CustomMapping
@@ -84,7 +77,6 @@ namespace ThisMember.Core
       }
     }
 
-    #endregion
   }
 
   public class MemberMap<TSource, TDestination> : MemberMap, IMemberMap<TSource, TDestination>
@@ -94,5 +86,15 @@ namespace ThisMember.Core
     {
       throw new NotImplementedException();
     }
+
+    #region IMemberMap<TSource,TDestination> Members
+
+    public new Func<TSource, TDestination, TDestination> MappingFunction
+    {
+      get;
+      set;
+    }
+
+    #endregion
   }
 }

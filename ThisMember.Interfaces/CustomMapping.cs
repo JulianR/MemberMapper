@@ -51,12 +51,7 @@ namespace ThisMember.Interfaces
 
     public Expression GetExpressionForMember(PropertyOrFieldInfo member)
     {
-      return WalkTreeForMember(this, member);
-    }
-
-    private static Expression WalkTreeForMember(CustomMapping mapping, PropertyOrFieldInfo member)
-    {
-      foreach (var m in mapping.Members)
+      foreach (var m in this.Members)
       {
         if (member.Equals(m.Member))
         {
@@ -66,9 +61,9 @@ namespace ThisMember.Interfaces
 
       Expression expression = null;
 
-      foreach (var cm in mapping.CustomMappings)
+      foreach (var cm in this.CustomMappings)
       {
-        expression = WalkTreeForMember(cm, member);
+        expression = cm.GetExpressionForMember(member);
       }
 
       return expression;

@@ -23,6 +23,11 @@ namespace ThisMember.Interfaces
 
     IProposedMap<TSource, TDestination> CreateMap<TSource, TDestination>(MappingOptions options = null, Expression<Func<TSource, object>> customMapping = null);
 
+    IMemberMap CreateAndFinalizeMap(Type source, Type destination, MappingOptions options = null);
+
+    IMemberMap<TSource, TDestination> CreateAndFinalizeMap<TSource, TDestination>(MappingOptions options = null, Expression<Func<TSource, object>> customMapping = null);
+
+
     void RegisterMap(IMemberMap map);
 
   }

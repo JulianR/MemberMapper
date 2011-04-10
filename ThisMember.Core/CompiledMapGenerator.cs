@@ -89,15 +89,15 @@ namespace ThisMember.Core
       
       BinaryExpression assignSourceToDest;
 
-      if (customMapping != null)
-      {
-        var x = customMapping.GetExpressionForMember(member.DestinationMember);
+      Expression customExpression;
 
+      if (customMapping != null && (customExpression = customMapping.GetExpressionForMember(member.DestinationMember)) != null)
+      {
         var visitor = new ParameterVisitor(customMapping.Parameter, source);
 
-        x = visitor.Visit(x);
+        customExpression = visitor.Visit(customExpression);
 
-        assignSourceToDest = Expression.Assign(destMember, x);
+        assignSourceToDest = Expression.Assign(destMember, customExpression);
 
       }
       else

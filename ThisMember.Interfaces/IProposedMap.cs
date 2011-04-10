@@ -25,5 +25,6 @@ namespace ThisMember.Interfaces
   public interface IProposedMap<TSource, TDestination> : IProposedMap
   {
     IProposedMap<TSource, TDestination> AddExpression<TSourceReturn, TDestinationReturn>(Expression<Func<TSource, TSourceReturn>> source, Expression<Func<TDestination, TDestinationReturn>> destination) where TDestinationReturn : TSourceReturn;
+
   }
 }
