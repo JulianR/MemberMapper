@@ -8,7 +8,7 @@ using System.Collections;
 
 namespace ThisMember.Core
 {
-  public static class CollectionTypeHelper
+  internal static class CollectionTypeHelper
   {
 
     public static bool IsEnumerable(ProposedTypeMapping mapping)

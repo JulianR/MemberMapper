@@ -48,5 +48,10 @@ namespace ThisMember.Core
     {
       return this.DestinationMember == mapping.DestinationMember && this.SourceMember== mapping.SourceMember;
     }
+
+    public override int GetHashCode()
+    {
+      return this.DestinationMember.GetHashCode() ^ this.SourceMember.GetHashCode();
+    }
   }
 }

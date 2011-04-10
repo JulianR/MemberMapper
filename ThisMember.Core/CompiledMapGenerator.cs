@@ -10,7 +10,7 @@ using System.Collections;
 
 namespace ThisMember.Core
 {
-  public class CompiledMapGenerator : IMapGenerator
+  internal class CompiledMapGenerator : IMapGenerator
   {
     private class ParameterVisitor : ExpressionVisitor
     {

@@ -61,18 +61,6 @@ namespace ThisMember.Core
     }
 
 
-    public CustomMapping CustomMapping
-    {
-      get
-      {
-        throw new NotImplementedException();
-      }
-      set
-      {
-        throw new NotImplementedException();
-      }
-    }
-
   }
 
   public class MemberMap<TSource, TDestination> : MemberMap
