@@ -27,6 +27,17 @@ namespace ThisMember.Core.Interfaces
 
     MemberMap<TSource, TDestination> CreateAndFinalizeMap<TSource, TDestination>(MappingOptions options = null, Expression<Func<TSource, object>> customMapping = null);
 
+    bool HasMap<TSource, TDestination>();
+
+    bool HasMap(Type source, Type destination);
+
+    MemberMap GetMap<TSource, TDestination>();
+
+    MemberMap GetMap(Type source, Type destination);
+
+    bool TryGetMap<TSource, TDestination>(out MemberMap map);
+
+    bool TryGetMap(Type source, Type destination, out MemberMap map);
 
     void RegisterMap(MemberMap map);
 

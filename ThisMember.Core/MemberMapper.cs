@@ -8,6 +8,21 @@ using System.Linq.Expressions;
 
 namespace ThisMember.Core
 {
+
+  public class MapNotFoundException : Exception
+  {
+
+    public Type SourceType { get; set; }
+
+    public Type DestinationType { get; set; }
+    public MapNotFoundException(Type source, Type destination)
+      : base(string.Format("No mapping between {0} and {1} exists", source, destination))
+    {
+      this.SourceType = source;
+      this.DestinationType = destination;
+    }
+  }
+
   public class MemberMapper : IMemberMapper
   {
 
@@ -122,5 +137,55 @@ namespace ThisMember.Core
       return CreateMap<TSource, TDestination>(options, customMapping).FinalizeMap().ToGeneric<TSource, TDestination>();
     }
 
+    public bool HasMap<TSource, TDestination>()
+    {
+      return this.maps.ContainsKey(new TypePair(typeof(TSource), typeof(TDestination)));
+    }
+
+    public bool HasMap(Type source, Type destination)
+    {
+      return this.maps.ContainsKey(new TypePair(source, destination));
+    }
+
+    public MemberMap GetMap<TSource, TDestination>()
+    {
+      MemberMap map;
+
+      if (!this.maps.TryGetValue(new TypePair(typeof(TSource), typeof(TDestination)), out map))
+      {
+        throw new MapNotFoundException(typeof(TSource), typeof(TDestination));
+      }
+      return map;
+
+    }
+
+    public MemberMap GetMap(Type source, Type destination)
+    {
+      MemberMap map;
+
+      if (!this.maps.TryGetValue(new TypePair(source, destination), out map))
+      {
+        throw new MapNotFoundException(source, destination);
+      }
+      return map;
+    }
+
+    public bool TryGetMap<TSource, TDestination>(out MemberMap map)
+    {
+      if (!this.maps.TryGetValue(new TypePair(typeof(TSource), typeof(TDestination)), out map))
+      {
+        return false;
+      }
+      return true;
+    }
+
+    public bool TryGetMap(Type source, Type destination, out MemberMap map)
+    {
+      if (!this.maps.TryGetValue(new TypePair(source, destination), out map))
+      {
+        return false;
+      }
+      return true;
+    }
   }
 }
